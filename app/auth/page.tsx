@@ -1,164 +1,147 @@
-    'use client';
+'use client';
 
-    import Link from "next/link";
-    import { use, useState } from "react";
+import { useAuth } from "@/contexts/auth-contexts";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
     export default function AuthPage() {
 
     const [isSignUp, setIsSignUp] = useState<boolean>(false);
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
+    const supabase = createClient();
+    const {} = useAuth();
+    const {user, loading: authLoading} = useAuth();
+    const router = useRouter();
+    
+    useEffect(() => {
+        if (user && !authLoading) {
+            router.push("/");
+        }
+    }, [user, authLoading, router]);
+
+    // FUNCTION TO HANDLE AUTHENTICATION
+    async function handleAuth(e: React.FormEvent) {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
+
+        try {
+            if (isSignUp) {
+                const {data, error} = await supabase.auth.signUp({
+                    email,
+                    password,
+                }); 
+                if (error) throw error;
+                // user has not confirmed email
+                if (data.user && !data.session) {
+                    setError("Please check your email to confirm your account.");
+                    return;
+                }
+            } else {
+                const {error} = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+                if (error) throw error;
+            }
+        } catch (error:any){
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-        {/* Logo */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">♥</span>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F7F4F3' }}>
+        <div className="max-w-md w-full space-y-8 p-8">
+        <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-2 mb-4">
+            <h1 className="text-3xl font-bold" style={{ color: '#583C5C' }}>
+                Marahuyo
+            </h1>
             </div>
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">
-            Hearts
-            </span>
-        </Link>
-
-        {/* Form Container */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-            <center><h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {isSignUp ? "Create Account" : "Welcome Back"}
-            </h1></center>
-            <p className="text-gray-600 dark:text-gray-400 mb-8">
-            {isSignUp
-                ? "Find your perfect match today"
-                : "Sign in to your Hearts account"}
-            </p>
-
-            <form className="space-y-5">
-            {/* Email */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email
-                </label>
-                <input
-                type="email"
-                placeholder="you@example.com"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                />
-            </div>
-
-            {/* Password */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
-                </label>
-                <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                />
-            </div>
-
-            {/* Sign Up Fields */}
-            {isSignUp && (
-                <>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Age
-                    </label>
-                    <input
-                    type="number"
-                    placeholder="Your age"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Location
-                    </label>
-                    <input
-                    type="text"
-                    placeholder="City, State"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Looking For
-                    </label>
-                    <select className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:text-white">
-                    <option>Select preference</option>
-                    <option>Men</option>
-                    <option>Women</option>
-                    <option>Everyone</option>
-                    </select>
-                </div>
-                </>
-            )}
-
-            {/* Remember Me / Forgot Password */}
-            {!isSignUp && (
-                <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                    <input type="checkbox" className="rounded" />
-                    Remember me
-                </label>
-                <a href="#" className="text-pink-500 hover:text-pink-600">
-                    Forgot password?
-                </a>
-                </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-                type="submit"
-                className="w-full py-3 bg-pink-500 text-white font-semibold rounded-lg hover:bg-pink-600 transition-colors mt-6"
-            >
-                {isSignUp ? "Create Account" : "Sign In"}
-            </button>
-            </form>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 my-6">
-            <div className="h-px flex-1 bg-gray-300 dark:bg-gray-600"></div>
-            <span className="text-gray-500 dark:text-gray-400 text-sm">or</span>
-            <div className="h-px flex-1 bg-gray-300 dark:bg-gray-600"></div>
-            </div>
-
-            {/* Social Login */}
-            <div className="space-y-3">
-            <button className="w-full py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-gray-700 dark:text-gray-300">
-                🔵 Continue with Facebook
-            </button>
-            <button className="w-full py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-gray-700 dark:text-gray-300">
-                🔴 Continue with Google
-            </button>
-            </div>
-
-            {/* Toggle Sign Up / Sign In */}
-            <p className="text-center text-gray-600 dark:text-gray-400 mt-8">
-            {isSignUp ? "Already have an account? " : "Don't have an account? "}
-            <button
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-pink-500 hover:text-pink-600 font-semibold"
-            >
-                {isSignUp ? "Sign In" : "Sign Up"}
-            </button>
+            <p style={{ color: '#3D3538' }}>
+            {isSignUp ? "Create Your Account" : "Sign in to your account"}
             </p>
         </div>
 
-        {/* Footer Links */}
-        <div className="flex justify-center gap-6 mt-8 text-sm text-gray-600 dark:text-gray-400">
-            <a href="#" className="hover:text-pink-500">
-            Privacy Policy
-            </a>
-            <a href="#" className="hover:text-pink-500">
-            Terms of Service
-            </a>
-            <a href="#" className="hover:text-pink-500">
-            Contact
-            </a>
+        <div className="bg-white rounded-2xl shadow-lg p-8" style={{ borderTop: `4px solid #583C5C` }}>
+        <form className="space-y-6" onSubmit={handleAuth}>
+            <div>
+            <label
+                htmlFor="email"
+                className="block text-sm font-medium mb-2"
+                style={{ color: '#583C5C' }}
+            >
+                Email
+            </label>
+            <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none"
+                style={{ 
+                    borderColor: '#B4A6C2',
+                    color: '#3D3538',
+                    '--tw-ring-color': '#583C5C'
+                } as any}
+                placeholder="Enter your email"
+            />
+            </div>
+
+            <div>
+            <label
+                htmlFor="password"
+                className="block text-sm font-medium mb-2"
+                style={{ color: '#583C5C' }}
+            >
+                Password
+            </label>
+            <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none"
+                style={{ borderColor: '#B4A6C2', color: '#3D3538' }}
+                placeholder="Enter your password"
+            />
+            </div>
+
+            {error && (
+            <div className="text-sm p-3 rounded" style={{ backgroundColor: '#F7F4F3', color: '#583C5C', borderLeft: `3px solid #E8B960` }}>
+                {error}
+            </div>
+            )}
+
+            <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
+            style={{ backgroundColor: '#583C5C' }}
+            >
+            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+            </button>
+        </form>
+
+        <div className="text-center mt-6 pt-6" style={{ borderTop: `1px solid #B4A6C2` }}>
+            <button
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-sm hover:opacity-80 transition-opacity"
+            style={{ color: '#583C5C' }}
+            >
+            {isSignUp
+                ? "Already have an account? Sign in"
+                : "Don't have an account? Sign up"}
+            </button>
+        </div>
         </div>
         </div>
     </div>

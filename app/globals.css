@@ -3,11 +3,23 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Twilight Enchantment Palette */
+  --primary: #583C5C;
+  --secondary: #E8B960;
+  --accent: #B4A6C2;
+  --bg-light: #F7F4F3;
+  --text-dark: #3D3538;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: #583C5C;
+  --color-secondary: #E8B960;
+  --color-accent: #B4A6C2;
+  --color-bg-light: #F7F4F3;
+  --color-text-dark: #3D3538;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
