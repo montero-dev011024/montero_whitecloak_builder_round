@@ -345,7 +345,7 @@ setProfileDetails((prev) => {
                 <div className="w-24 h-24 rounded-full overflow-hidden">
                 <img
                     src={
-                    formData.profile_picture_url || "/default-avatar.png"
+                    formData.profile_picture_url || "/default-avatar.svg"
                     }
                     alt="Profile"
                     className="w-full h-full object-cover"

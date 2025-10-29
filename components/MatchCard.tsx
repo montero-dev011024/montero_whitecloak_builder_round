@@ -2,7 +2,7 @@ import { UserProfile } from "@/app/profile/page";
 import { calculateAge } from "@/lib/helpers/calculate-age";
 import Image from "next/image";
 
-const DEFAULT_AVATAR = "/default-avatar.png";
+const DEFAULT_AVATAR = "/default-avatar.svg";
 
 export default function MatchCard({ user }: { user: UserProfile }) {
   const imageSrc = user.profile_picture_url || DEFAULT_AVATAR;
@@ -18,6 +18,7 @@ export default function MatchCard({ user }: { user: UserProfile }) {
             alt={displayName}
             fill
             className="object-cover transition-opacity duration-300"
+            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 60vw, 400px"
             priority={imageSrc !== DEFAULT_AVATAR}
           />
 

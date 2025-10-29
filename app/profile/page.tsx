@@ -143,7 +143,7 @@ export default function ProfilePage() {
                   <div className="relative">
                     <div className="w-24 h-24 rounded-full overflow-hidden">
                       <img
-                        src={profile.profile_picture_url || "/default-avatar.png"}
+                        src={profile.profile_picture_url || "/default-avatar.svg"}
                         alt={profile.full_name}
                         className="w-full h-full object-cover"
                       />

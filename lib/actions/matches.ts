@@ -143,14 +143,31 @@
     throw new Error("Not authenticated.");
     }
 
-    const { error: likeError } = await supabase.from("likes").insert({
-    from_user_id: user.id,
-    to_user_id: toUserId,
-    });
+        const { error: likeError } = await supabase
+            .from("likes")
+            .insert({
+                from_user_id: user.id,
+                to_user_id: toUserId,
+            });
 
-    if (likeError) {
-    throw new Error("Failed to create like");
-    }
+        if (likeError) {
+            if (likeError.code === "23505") {
+                const { error: reactivateError } = await supabase
+                    .from("likes")
+                    .update({
+                        is_active: true,
+                        unliked_at: null,
+                    })
+                    .eq("from_user_id", user.id)
+                    .eq("to_user_id", toUserId);
+
+                if (reactivateError) {
+                    throw new Error("Failed to reactivate like");
+                }
+            } else {
+                throw new Error("Failed to create like");
+            }
+        }
 
     const { data: existingLike, error: checkError } = await supabase
     .from("likes")
