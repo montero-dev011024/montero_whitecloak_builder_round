@@ -23,7 +23,6 @@
         gender gender_enum NOT NULL,
         birthdate DATE NOT NULL,
         bio TEXT,
-        profile_picture_url TEXT,
         
         -- Preferences stored as JSONB (flexible for future enhancements)
         preferences JSONB DEFAULT '{
@@ -263,7 +262,6 @@
             gender,
             birthdate,
             bio,
-            profile_picture_url,
             preferences
         ) VALUES (
             NEW.id,
@@ -272,7 +270,6 @@
             'prefer_not_to_say',  -- Use enum value
             CURRENT_DATE - INTERVAL '25 years',  -- Default: 25 years old
             '',
-            NULL,
             '{
                 "age_range": {"min": 18, "max": 50},
                 "distance_miles": 25,
@@ -386,6 +383,10 @@
     CREATE POLICY "Users can update their own profile details"
         ON public.profiles FOR UPDATE
         USING (auth.uid() = user_id);
+
+    CREATE POLICY "Users can insert their own profile details"
+        ON public.profiles FOR INSERT
+        WITH CHECK (auth.uid() = user_id);
 
     -- ===== INTERESTS TABLE POLICIES =====
 

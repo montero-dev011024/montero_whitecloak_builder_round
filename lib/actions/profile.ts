@@ -1,140 +1,273 @@
-    "use server";
+"use server";
 
-    import { UserProfile } from "@/app/profile/page";
-    import { createClient } from "../supabase/server";
+import type { UserPreferences, UserProfile } from "@/app/profile/page";
+import { createClient } from "../supabase/server";
 
-    export async function getCurrentUserProfile() {
+const DEFAULT_USER_PREFERENCES: UserPreferences = {
+    age_range: {
+        min: 18,
+        max: 50,
+    },
+    distance_miles: 25,
+    gender_preferences: [],
+    relationship_goal: "not_sure",
+};
+
+const normalizePreferences = (raw: unknown): UserPreferences => {
+    if (!raw || typeof raw !== "object") {
+        return structuredClone(DEFAULT_USER_PREFERENCES);
+    }
+
+    const candidate = raw as Partial<UserPreferences>;
+    const toNumber = (value: unknown, fallback: number) => {
+        if (typeof value === "number" && Number.isFinite(value)) {
+            return value;
+        }
+
+        if (typeof value === "string" && value.trim()) {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : fallback;
+        }
+
+        return fallback;
+    };
+
+    const allowedGoals: UserPreferences["relationship_goal"][] = [
+        "something_casual",
+        "something_serious",
+        "not_sure",
+        "just_exploring",
+    ];
+
+    const relationshipGoalCandidate = candidate.relationship_goal ?? "not_sure";
+
+    const genderPreferencesArray = Array.isArray(candidate.gender_preferences)
+        ? candidate.gender_preferences.filter(
+                (value): value is string => typeof value === "string" && value.length > 0,
+            )
+        : [];
+
+    return {
+        age_range: {
+            min: toNumber(candidate.age_range?.min, DEFAULT_USER_PREFERENCES.age_range.min),
+            max: toNumber(candidate.age_range?.max, DEFAULT_USER_PREFERENCES.age_range.max),
+        },
+        distance_miles: toNumber(
+            candidate.distance_miles,
+            DEFAULT_USER_PREFERENCES.distance_miles,
+        ),
+        gender_preferences: Array.from(new Set(genderPreferencesArray)),
+        relationship_goal: allowedGoals.includes(relationshipGoalCandidate)
+            ? relationshipGoalCandidate
+            : DEFAULT_USER_PREFERENCES.relationship_goal,
+    };
+};
+
+const mergePreferences = (
+    current: UserPreferences,
+    updates: Partial<UserPreferences>,
+): UserPreferences => {
+    const merged: UserPreferences = {
+        age_range: {
+            min: updates.age_range?.min ?? current.age_range.min,
+            max: updates.age_range?.max ?? current.age_range.max,
+        },
+        distance_miles: updates.distance_miles ?? current.distance_miles,
+        gender_preferences: updates.gender_preferences
+            ? Array.from(new Set(updates.gender_preferences))
+            : [...current.gender_preferences],
+        relationship_goal: updates.relationship_goal ?? current.relationship_goal,
+    };
+
+    if (merged.age_range.min > merged.age_range.max) {
+        const min = Math.min(merged.age_range.min, merged.age_range.max);
+        const max = Math.max(merged.age_range.min, merged.age_range.max);
+        merged.age_range = { min, max };
+    }
+
+    return merged;
+};
+
+async function getAuthenticatedUserId() {
     const supabase = await createClient();
-
     const {
-    data: { user },
+        data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-    return null;
+        return { supabase, userId: null } as const;
     }
 
+    return { supabase, userId: user.id } as const;
+}
+
+export async function getCurrentUserProfile() {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+        return null;
+    }
+
+    // Fetch user data from users table
     const { data: profile, error } = await supabase
-    .from("users")
-    .select(
-        `
-        id,
-        full_name,
-        email,
-        gender,
-        birthdate,
-        bio,
-        profile_picture_url,
-        preferences,
-        location_lat,
-        location_lng,
-        is_online,
-        last_active_at,
-        verified_at,
-        created_at,
-        updated_at
-    `
-    )
-    .eq("id", user.id)
-    .single();
+        .from("users")
+        .select(
+            `
+            id,
+            full_name,
+            email,
+            gender,
+            birthdate,
+            bio,
+            preferences,
+            location_lat,
+            location_lng,
+            is_online,
+            last_active_at,
+            verified_at,
+            created_at,
+            updated_at
+        `,
+        )
+        .eq("id", user.id)
+        .single();
 
     if (error) {
-    console.error("Error fetching profile:", error);
-    return null;
+        console.error("Error fetching profile:", error);
+        return null;
     }
 
-    return profile as UserProfile;
+    // Fetch profile details from profiles table
+    const { data: profileDetails, error: detailsError } = await supabase
+        .from("profiles")
+        .select(
+            `
+            profile_picture_url,
+            profile_picture_uploaded_at,
+            height_cm,
+            education,
+            occupation,
+            relationship_goal,
+            smoking,
+            drinking,
+            children
+        `,
+        )
+        .eq("user_id", user.id)
+        .single();
+
+    if (detailsError) {
+        console.error("Error fetching profile details:", detailsError);
+        // Continue without profile details if they don't exist yet
     }
 
-    export async function updateUserProfile(
-    profileData: Partial<UserProfile>
-    ) {
+    const combinedProfile = {
+        ...profile,
+        ...(profileDetails ?? {}),
+        profile_picture_url: profileDetails?.profile_picture_url ?? null,
+    };
+
+    return combinedProfile as UserProfile;
+}
+
+export async function updateUserProfile(profileData: Partial<UserProfile>) {
     const supabase = await createClient();
 
     const {
-    data: { user },
+        data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-    return { success: false, error: "User not authenticated" };
+        return { success: false, error: "User not authenticated" };
     }
 
     const updatePayload: Record<string, unknown> = {
-    updated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
     };
 
     if (profileData.full_name) updatePayload.full_name = profileData.full_name;
     if (profileData.bio) updatePayload.bio = profileData.bio;
     if (profileData.gender) updatePayload.gender = profileData.gender;
     if (profileData.birthdate) updatePayload.birthdate = profileData.birthdate;
-    if (profileData.profile_picture_url)
-    updatePayload.profile_picture_url = profileData.profile_picture_url;
     if (profileData.location_lat)
-    updatePayload.location_lat = profileData.location_lat;
+        updatePayload.location_lat = profileData.location_lat;
     if (profileData.location_lng)
-    updatePayload.location_lng = profileData.location_lng;
+        updatePayload.location_lng = profileData.location_lng;
     if (profileData.preferences)
-    updatePayload.preferences = profileData.preferences;
+        updatePayload.preferences = profileData.preferences;
 
     const { error } = await supabase
-    .from("users")
-    .update(updatePayload)
-    .eq("id", user.id);
+        .from("users")
+        .update(updatePayload)
+        .eq("id", user.id);
 
     if (error) {
-    console.log(error);
-    return { success: false, error: error.message };
+        console.log(error);
+        return { success: false, error: error.message };
     }
 
     return { success: true };
-    }
+}
 
-    export async function uploadProfilePhoto(file: File) {
+export async function uploadProfilePhoto(file: File) {
     const supabase = await createClient();
 
     const {
-    data: { user },
+        data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-    return { success: false, error: "User not authenticated" };
+        return { success: false, error: "User not authenticated" };
     }
 
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+    const fileExtension = file.name.split(".").pop();
+    const fileName = `${user.id}/${user.id}-${Date.now()}.${fileExtension}`;
+
+    console.log("Uploading file:", fileName);
 
     const { error } = await supabase.storage
-    .from("profile-photos")
-    .upload(fileName, file, {
-        cacheControl: "3600",
-        upsert: false,
-    });
+        .from("profile-photos")
+        .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false,
+        });
 
     if (error) {
-    return { success: false, error: error.message };
+        console.error("Storage upload error:", error);
+        return { success: false, error: error.message };
     }
 
     const {
-    data: { publicUrl },
+        data: { publicUrl },
     } = supabase.storage.from("profile-photos").getPublicUrl(fileName);
 
-    // Update user profile with new photo URL
-    const { error: updateError } = await supabase
-    .from("users")
-    .update({
-        profile_picture_url: publicUrl,
-        updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
+    console.log("Public URL:", publicUrl);
+
+        const profilePicturePayload = {
+            user_id: user.id,
+            profile_picture_url: publicUrl,
+            profile_picture_uploaded_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+
+        const { error: updateError } = await supabase
+            .from("profiles")
+            .upsert(profilePicturePayload, { onConflict: "user_id" });
 
     if (updateError) {
-    return { success: false, error: updateError.message };
+        console.error("Database update error:", updateError);
+        return { success: false, error: updateError.message };
     }
 
+    console.log("Profile picture URL updated successfully");
     return { success: true, url: publicUrl };
-    }
+}
 
-    export async function updateProfileDetails(profileData: {
+export async function updateProfileDetails(profileData: {
     height_cm?: number;
     education?: string;
     occupation?: string;
@@ -142,34 +275,131 @@
     smoking?: boolean;
     drinking?: boolean;
     children?: string;
-    }) {
+}) {
     const supabase = await createClient();
 
     const {
-    data: { user },
+        data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-    return { success: false, error: "User not authenticated" };
+        return { success: false, error: "User not authenticated" };
     }
 
     const { error } = await supabase
-    .from("profiles")
-    .update({
-        ...profileData,
-        updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", user.id);
+        .from("profiles")
+        .update({
+            ...profileData,
+            updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.id);
 
     if (error) {
-    console.log(error);
-    return { success: false, error: error.message };
+        console.log(error);
+        return { success: false, error: error.message };
     }
 
     return { success: true };
+}
+
+export async function updateUserPreferences(
+    preferencesUpdate: Partial<UserPreferences>,
+) {
+    const { supabase, userId } = await getAuthenticatedUserId();
+
+    if (!userId) {
+        return { success: false, error: "User not authenticated" };
     }
 
-    export async function addUserInterests(interestIds: number[]) {
+    const { data: existing, error } = await supabase
+        .from("users")
+        .select("preferences")
+        .eq("id", userId)
+        .single();
+
+    if (error) {
+        console.log(error);
+        return { success: false, error: "Failed to load current preferences" };
+    }
+
+    const current = normalizePreferences(existing?.preferences);
+    const merged = mergePreferences(current, preferencesUpdate);
+
+    const { error: updateError } = await supabase
+        .from("users")
+        .update({
+            preferences: merged,
+            updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
+
+    if (updateError) {
+        console.log(updateError);
+        return { success: false, error: "Failed to update preferences" };
+    }
+
+    return { success: true, preferences: merged };
+}
+
+type GenderPreference = UserPreferences["gender_preferences"][number];
+
+export async function addGenderPreference(gender: GenderPreference) {
+    if (!gender || typeof gender !== "string") {
+        return { success: false, error: "Invalid gender preference" };
+    }
+
+    const { supabase, userId } = await getAuthenticatedUserId();
+
+    if (!userId) {
+        return { success: false, error: "User not authenticated" };
+    }
+
+    const { data: existing, error } = await supabase
+        .from("users")
+        .select("preferences")
+        .eq("id", userId)
+        .single();
+
+    if (error) {
+        console.log(error);
+        return { success: false, error: "Failed to load current preferences" };
+    }
+
+    const current = normalizePreferences(existing?.preferences);
+    const updated = Array.from(new Set([...current.gender_preferences, gender]));
+
+    return updateUserPreferences({ gender_preferences: updated });
+}
+
+export async function removeGenderPreference(gender: GenderPreference) {
+    if (!gender || typeof gender !== "string") {
+        return { success: false, error: "Invalid gender preference" };
+    }
+
+    const { supabase, userId } = await getAuthenticatedUserId();
+
+    if (!userId) {
+        return { success: false, error: "User not authenticated" };
+    }
+
+    const { data: existing, error } = await supabase
+        .from("users")
+        .select("preferences")
+        .eq("id", userId)
+        .single();
+
+    if (error) {
+        console.log(error);
+        return { success: false, error: "Failed to load current preferences" };
+    }
+
+    const current = normalizePreferences(existing?.preferences);
+    const filtered = current.gender_preferences.filter((item) => item !== gender);
+
+    return updateUserPreferences({ gender_preferences: filtered });
+}
+
+        export async function addUserInterests(interestIds: number[]) {
     const supabase = await createClient();
 
     const {

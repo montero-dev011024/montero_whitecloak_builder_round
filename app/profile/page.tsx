@@ -14,6 +14,7 @@ export interface UserProfile {
   birthdate: string;
   bio: string;
   profile_picture_url: string | null;
+  profile_picture_uploaded_at?: string | null;
   preferences: UserPreferences;
   location_lat: number | null;
   location_lng: number | null;
@@ -22,6 +23,14 @@ export interface UserProfile {
   verified_at: string | null;
   created_at: string;
   updated_at: string;
+  // Profile details from profiles table
+  height_cm?: number | null;
+  education?: string | null;
+  occupation?: string | null;
+  relationship_goal?: "something_casual" | "something_serious" | "not_sure" | "just_exploring";
+  smoking?: boolean | null;
+  drinking?: boolean | null;
+  children?: string | null;
 }
 
 export interface UserPreferences {
@@ -175,7 +184,7 @@ export default function ProfilePage() {
                           Gender
                         </label>
                         <p className="text-gray-900 dark:text-white capitalize">
-                          {profile.gender}
+                          {profile.gender.replace(/_/g, " ")}
                         </p>
                       </div>
                       <div>
@@ -188,6 +197,88 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Profile Details Section */}
+                  {(profile.height_cm || profile.education || profile.occupation || 
+                    profile.smoking !== null || profile.drinking !== null || profile.children) && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                        Additional Details
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        {profile.height_cm && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Height
+                            </label>
+                            <p className="text-gray-900 dark:text-white">
+                              {profile.height_cm} cm
+                            </p>
+                          </div>
+                        )}
+                        {profile.relationship_goal && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Looking for
+                            </label>
+                            <p className="text-gray-900 dark:text-white capitalize">
+                              {profile.relationship_goal.replace(/_/g, " ")}
+                            </p>
+                          </div>
+                        )}
+                        {profile.education && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Education
+                            </label>
+                            <p className="text-gray-900 dark:text-white">
+                              {profile.education}
+                            </p>
+                          </div>
+                        )}
+                        {profile.occupation && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Occupation
+                            </label>
+                            <p className="text-gray-900 dark:text-white">
+                              {profile.occupation}
+                            </p>
+                          </div>
+                        )}
+                        {profile.smoking !== null && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Smoking
+                            </label>
+                            <p className="text-gray-900 dark:text-white">
+                              {profile.smoking ? "Yes" : "No"}
+                            </p>
+                          </div>
+                        )}
+                        {profile.drinking !== null && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Drinking
+                            </label>
+                            <p className="text-gray-900 dark:text-white">
+                              {profile.drinking ? "Yes" : "No"}
+                            </p>
+                          </div>
+                        )}
+                        {profile.children && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Children
+                            </label>
+                            <p className="text-gray-900 dark:text-white capitalize">
+                              {profile.children.replace(/_/g, " ")}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">

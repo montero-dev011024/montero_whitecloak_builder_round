@@ -9,8 +9,8 @@
   - `id` (FK to auth.users)
   - `full_name`, `email`, `gender`
   - `birthdate` (enforced 18+ check)
-  - `bio`, `profile_picture_url`
-  - `location_point` (PostGIS geography for efficient distance queries)
+  - `bio`
+  - `location_lat`, `location_lng`
   - `preferences` (JSONB - age range, distance, gender prefs)
   - `last_active_at`, `verified_at`, `is_online`
 - **Partitioned By**: `created_at` (yearly)
@@ -21,18 +21,15 @@
 - **Purpose**: Optional user details (1NF compliance)
 - **Key Fields**:
   - `user_id` (1:1 relationship)
+  - `profile_picture_url`, `profile_picture_uploaded_at`
   - `height_cm`, `education`, `occupation`
   - `relationship_goal` (enum)
   - `smoking`, `drinking`, `children`
   - `visibility` (soft delete)
 
-### `photos` (Multi-photo support)
+### `photos`
 
-- **Purpose**: User profile photos
-- **Key Fields**:
-  - `user_id` (N:1 relationship)
-  - `url`, `is_primary`, `display_order`
-- **Constraint**: Only one primary per user (enforced via trigger)
+- **Status**: Removed for MVP. A single `profile_picture_url` now lives on the `profiles` table.
 
 ### `interests` (Global lookup)
 
