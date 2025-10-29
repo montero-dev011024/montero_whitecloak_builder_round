@@ -9,7 +9,6 @@
         updateUserPreferences,
     } from "@/lib/actions/profile";
     import MatchCard from "@/components/MatchCard";
-    import MatchButtons from "@/components/MatchButtons";
     import MatchNotification from "@/components/MatchNotification";
 
     const defaultPreferences: UserPreferences = {
@@ -570,10 +569,11 @@
                     <div className="max-w-md mx-auto">
                         {hasMatches && currentPotentialMatch ? (
                             <>
-                                <MatchCard user={currentPotentialMatch} />
-                                <div className="mt-8">
-                                    <MatchButtons onLike={handleLike} onPass={handlePass} />
-                                </div>
+                                <MatchCard 
+                                    user={currentPotentialMatch} 
+                                    onLike={handleLike}
+                                    onPass={handlePass}
+                                />
                             </>
                         ) : (
                             <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
