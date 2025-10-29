@@ -1,12 +1,11 @@
 "use client";
 
 import PhotoUpload from "@/components/PhotoUpload";
-import type { UserPreferences, UserProfile } from "@/app/profile/page";
+import type { UserProfile } from "@/app/profile/page";
 import {
     getCurrentUserProfile,
     updateUserProfile,
     updateProfileDetails,
-    updateUserPreferences,
 } from "@/lib/actions/profile";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -32,22 +31,6 @@ drinking: boolean | null;
 children: string;
 }
 
-    const defaultPreferences: UserPreferences = {
-        age_range: {
-            min: 18,
-            max: 50,
-        },
-        distance_miles: 25,
-        gender_preferences: [],
-        relationship_goal: "not_sure",
-    };
-
-    const genderPreferenceOptions: Array<UserPreferences["gender_preferences"][number]> = [
-        "male",
-        "female",
-        "non-binary",
-    ];
-
     const [formData, setFormData] = useState<EditableProfileFormState>({
         full_name: "",
         bio: "",
@@ -65,8 +48,6 @@ children: string;
         drinking: null,
         children: "",
     });
-
-    const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
 
     const [email, setEmail] = useState<string>("");
 
@@ -95,20 +76,6 @@ children: string;
         children: profileData.children ?? "",
         });
 
-                setPreferences({
-                    age_range: {
-                        min: profileData.preferences?.age_range?.min ?? defaultPreferences.age_range.min,
-                        max: profileData.preferences?.age_range?.max ?? defaultPreferences.age_range.max,
-                    },
-                    distance_miles:
-                        profileData.preferences?.distance_miles ?? defaultPreferences.distance_miles,
-                    gender_preferences:
-                        profileData.preferences?.gender_preferences?.length
-                            ? [...profileData.preferences.gender_preferences]
-                            : [],
-                    relationship_goal:
-                        profileData.preferences?.relationship_goal ?? defaultPreferences.relationship_goal,
-                });
     }
     } catch (err) {
     setError("Failed to load profile");
@@ -152,22 +119,6 @@ try {
     setSaving(false);
     return;
     }
-
-        const preferencesResult = await updateUserPreferences({
-            age_range: {
-                min: preferences.age_range.min,
-                max: preferences.age_range.max,
-            },
-            distance_miles: preferences.distance_miles,
-            gender_preferences: preferences.gender_preferences,
-            relationship_goal: preferences.relationship_goal,
-        });
-
-        if (!preferencesResult.success) {
-            setError(preferencesResult.error || "Failed to update preferences.");
-            setSaving(false);
-            return;
-        }
 
     router.push("/profile");
 } catch (err) {
@@ -243,68 +194,6 @@ setProfileDetails((prev) => {
     }
 });
 }
-
-    function handlePreferencesChange(
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    ) {
-        const { name, value } = e.target;
-
-        setPreferences((prev) => {
-            switch (name) {
-                case "age_range_min": {
-                    const parsed = value ? parseInt(value, 10) : prev.age_range.min;
-                    return {
-                        ...prev,
-                        age_range: {
-                            ...prev.age_range,
-                            min: Number.isNaN(parsed) ? prev.age_range.min : parsed,
-                        },
-                    };
-                }
-                case "age_range_max": {
-                    const parsed = value ? parseInt(value, 10) : prev.age_range.max;
-                    return {
-                        ...prev,
-                        age_range: {
-                            ...prev.age_range,
-                            max: Number.isNaN(parsed) ? prev.age_range.max : parsed,
-                        },
-                    };
-                }
-                case "distance_miles": {
-                    const parsed = value ? parseInt(value, 10) : prev.distance_miles;
-                    return {
-                        ...prev,
-                        distance_miles: Number.isNaN(parsed) ? prev.distance_miles : parsed,
-                    };
-                }
-                case "relationship_goal_preference":
-                    return {
-                        ...prev,
-                        relationship_goal: value as UserPreferences["relationship_goal"],
-                    };
-                default:
-                    return prev;
-            }
-        });
-    }
-
-    function toggleGenderPreference(value: UserPreferences["gender_preferences"][number]) {
-        setPreferences((prev) => {
-            const next = new Set(prev.gender_preferences);
-
-            if (next.has(value)) {
-                next.delete(value);
-            } else {
-                next.add(value);
-            }
-
-            return {
-                ...prev,
-                gender_preferences: Array.from(next),
-            };
-        });
-    }
 
     if (loading) {
         return (
@@ -627,114 +516,6 @@ setProfileDetails((prev) => {
             </div>
             </div>
         </div>
-
-                <div className="mb-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                        Preferences
-                    </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label
-                                htmlFor="distance_miles"
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                            >
-                                Maximum Distance (miles)
-                            </label>
-                            <input
-                                type="number"
-                                id="distance_miles"
-                                name="distance_miles"
-                                min="1"
-                                max="500"
-                                value={preferences.distance_miles}
-                                onChange={handlePreferencesChange}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                                placeholder="e.g., 25"
-                            />
-                        </div>
-
-                        <div>
-                            <label
-                                htmlFor="relationship_goal_preference"
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                            >
-                                Relationship Goal Preference
-                            </label>
-                            <select
-                                id="relationship_goal_preference"
-                                name="relationship_goal_preference"
-                                value={preferences.relationship_goal}
-                                onChange={handlePreferencesChange}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                            >
-                                <option value="not_sure">Not sure</option>
-                                <option value="something_casual">Something casual</option>
-                                <option value="something_serious">Something serious</option>
-                                <option value="just_exploring">Just exploring</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Preferred Age Range
-                            </label>
-                            <div className="flex space-x-4">
-                                <input
-                                    type="number"
-                                    name="age_range_min"
-                                    min="18"
-                                    max={preferences.age_range.max}
-                                    value={preferences.age_range.min}
-                                    onChange={handlePreferencesChange}
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                                    placeholder="Min"
-                                />
-                                <input
-                                    type="number"
-                                    name="age_range_max"
-                                    min={preferences.age_range.min}
-                                    max="100"
-                                    value={preferences.age_range.max}
-                                    onChange={handlePreferencesChange}
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                                    placeholder="Max"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Gender Preferences
-                            </label>
-                            <div className="flex flex-wrap gap-3">
-                                {genderPreferenceOptions.map((option) => {
-                                    const checked = preferences.gender_preferences.includes(option);
-                                    return (
-                                        <label
-                                            key={option}
-                                            className={`flex items-center space-x-2 px-3 py-2 rounded-lg border ${
-                                                checked
-                                                    ? "border-pink-500 bg-pink-50 dark:bg-pink-500/20"
-                                                    : "border-gray-300 dark:border-gray-600"
-                                            } text-sm text-gray-700 dark:text-gray-200 cursor-pointer`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                checked={checked}
-                                                onChange={() => toggleGenderPreference(option)}
-                                                className="form-checkbox h-4 w-4 text-pink-500 focus:ring-pink-500"
-                                            />
-                                            <span className="capitalize">{option.replace(/_/g, " ")}</span>
-                                        </label>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
         {error && (
             <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">

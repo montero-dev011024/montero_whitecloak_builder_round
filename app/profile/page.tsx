@@ -280,30 +280,6 @@ export default function ProfilePage() {
                     </div>
                   )}
 
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                      Dating Preferences
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Age Range
-                        </label>
-                        <p className="text-gray-900 dark:text-white">
-                          {profile.preferences.age_range.min} -{" "}
-                          {profile.preferences.age_range.max} years
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Distance
-                        </label>
-                        <p className="text-gray-900 dark:text-white">
-                          Up to {profile.preferences.distance_miles} miles
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
