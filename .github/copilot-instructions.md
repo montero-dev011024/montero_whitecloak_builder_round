@@ -59,107 +59,60 @@ The app wraps all components in `AuthProvider` (in `app/layout.tsx`) which manag
 npm run dev          # Start Next.js dev server (localhost:3000)
 npm run build        # Production build
 npm start            # Start production server
-npm run lint         # Run ESLint (ESLint 9 with Next.js config)
-```
+## AI Coding Agent Instructions — Hearts Dating App (Marahuyo)
 
-### Environment Setup
+Note: do not use emojis in edits and avoid creating new Markdown files unless requested.
 
-1. Create `.env.local` (not tracked in git) with:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-2. Install deps: `npm install` (Supabase SSR already included)
+Quick orientation (what matters):
 
-### Adding Supabase Features
+- Stack: Next.js 16 (App Router) + React 19 + TypeScript 5. Styling via Tailwind CSS v4.
+- Auth: Supabase (browser client only). Env keys live in `.env.local`: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY.
 
-- Always use `createBrowserClient()` for client-side initialization (in `lib/supabase/client.ts`)
-- For server-side operations (future): Create `lib/supabase/server.ts` with `createServerClient()`
-- Supabase auth methods: Prefer built-in `.signUp()`, `.signInWithPassword()`, `.signOut()`
+Key files to inspect first:
 
----
+- `app/layout.tsx` — wraps the app with `AuthProvider`.
+- `contexts/auth-contexts.tsx` — `AuthProvider` and `useAuth()` hook; look here for session init and `onAuthStateChange` behavior.
+- `lib/supabase/client.ts` — creates the browser Supabase client with `createBrowserClient()`.
+- `app/auth/page.tsx` — sign-in / sign-up UI and redirect examples (useAuth + useRouter pattern).
 
-## 🎨 Code Conventions & Patterns
+Conventions and patterns to follow:
 
-### Styling
+- Client components must include `'use client'` at the top.
+- Use the `useAuth()` hook for auth state; avoid prop drilling for user/session.
+- TypeScript is strict — prefer explicit types (project uses `*Type` suffix for interfaces).
+- Path alias: `@/*` → `./*` (use existing tsconfig imports).
+- Styling: Tailwind-first. Brand colors used inline in components when needed (hex example: 583C5C).
 
-- **Tailwind v4 first**: Primary styling approach. All custom colors use brand palette inline or via constants
-- **Brand colors as inline styles**: Common pattern - `style={{ backgroundColor: '#583C5C' }}` for brand colors
-- **Responsive classes**: Use Tailwind's `md:`, `sm:` prefixes (e.g., `text-5xl md:text-6xl`)
+Auth flow (practical snippets):
 
-### Component Patterns
+- Sign-in redirect pattern:
 
-- **Client components**: Use `'use client'` directive at top of file
-- **Hooks**: Prefer `useAuth()` for global auth state, avoid prop drilling
-- **State management**: Local `useState` for component-level state; React Context for global auth only
-
-### TypeScript
-
-- **Strict mode enabled**: `"strict": true` in `tsconfig.json`
-- **Type imports**: Use `User` type from `@supabase/supabase-js` for auth objects
-- **Interface naming**: Use `*Type` suffix (e.g., `AuthContextType`) for context/provider types
-
-### Error Handling
-
-- Auth errors caught in try-catch blocks and displayed to users
-- Supabase operations return `{data, error}` tuples - always check error before using data
-
----
-
-## 📂 Project Structure Reference
-
-```
-app/                    # Next.js App Router pages
-├── layout.tsx         # Root layout with AuthProvider wrapper
-├── page.tsx           # Landing page (public)
-├── auth/
-│   └── page.tsx       # Authentication page (sign-in/sign-up)
-├── globals.css        # Global Tailwind styles
-contexts/
-├── auth-contexts.tsx  # AuthProvider and useAuth hook
-lib/
-├── supabase/
-│   ├── client.ts      # Browser Supabase client factory
-│   └── server.ts      # (Future) Server-side Supabase client
-public/               # Static assets
-```
-
----
-
-## 🔄 Common Development Tasks
-
-### Adding a New Authenticated Page
-
-1. Create page in `app/[feature]/page.tsx` with `'use client'` directive
-2. Use `useAuth()` to check `user` state and redirect if needed
-3. Example redirect pattern (from `app/auth/page.tsx`):
-   ```tsx
-   const {user, loading} = useAuth();
+   const { user, loading } = useAuth();
    const router = useRouter();
-   useEffect(() => {
-     if (user && !loading) router.push("/");
-   }, [user, loading, router]);
-   ```
+   useEffect(() => { if (user && !loading) router.push('/'); }, [user, loading, router]);
 
-### Extending Authentication
+- Use Supabase client in client code only via `lib/supabase/client.ts`. Server-side helpers live in `lib/supabase/server.ts` (future use).
 
-- Add new auth context properties: Update `AuthContextType` interface and provider in `contexts/auth-contexts.tsx`
-- Supabase methods available: `.signUp()`, `.signInWithPassword()`, `.signOut()`, `.getSession()`, `.onAuthStateChange()`
+Dev commands (use zsh):
 
-### Styling New Components
+```
+npm install
+npm run dev      # start dev server (http://localhost:3000)
+npm run build
+npm start        # production
+npm run lint
+```
 
-- Use Tailwind classes for responsive design
-- Reference brand colors in `app/page.tsx` for consistent hex values
-- Dark mode support included but currently minimal (prepare for future: `dark:` classes exist)
+Search-first guidance for tasks:
 
----
+- For auth work: edit `contexts/auth-contexts.tsx`, `lib/supabase/client.ts`, and `app/auth/page.tsx`.
+- For UI pages: inspect `app/*` routes (e.g., `discover`, `messages`, `profile`).
+- For shared components: check `components/` (e.g., `MatchCard.tsx`, `SwipeableCard.tsx`).
 
-## ⚠️ Important Caveats
+Quick pitfalls to watch for:
 
-- **Email confirmation**: Supabase email confirmation may be enabled in project settings - handle cases where user exists but session is null
-- **Environment variables**: All Supabase keys are `NEXT_PUBLIC_*` (safe to expose to browser as they're read-only anon keys)
-- **No server-side auth yet**: Current setup uses browser client only; adding server-side routes will require `lib/supabase/server.ts` implementation
+- Many flows assume the anonymous public Supabase key (NEXT_PUBLIC_*). Missing env vars will break dev auth.
+- Client-only Supabase usage — avoid moving client calls to server code without adding server client helpers.
+- Respect `'use client'` vs server components in the App Router; mixing them causes runtime errors.
 
----
-
-## 🎯 Next Development Priorities (from README)
-
-The roadmap includes: user profiles, matching algorithm, messaging system, and swiping interface. Plan for these features to live in new routes (e.g., `/dashboard`, `/messages`) wrapped with auth guards using the `useAuth()` hook.
+If something in these instructions is incomplete or you'd like more examples (tests, CI, or a checklist for adding a new route), tell me which area to expand and I will iterate.

@@ -66,7 +66,7 @@ export default function Navbar() {
                                     Matches
                                 </Link>
                                 <Link
-                                    href="/messages"
+                                    href="/chat"
                                     className="text-gray-700 hover:font-semibold transition-colors duration-200"
                                     style={{ color: "#3D3538" }}
                                 >
@@ -211,7 +211,7 @@ export default function Navbar() {
                             Matches
                         </Link>
                         <Link
-                            href="/messages"
+                            href="/chat"
                             className="block px-4 py-2 text-sm rounded hover:bg-gray-100 transition-colors"
                             style={{ color: "#3D3538" }}
                             onClick={() => setIsDropdownOpen(false)}
