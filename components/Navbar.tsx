@@ -103,20 +103,11 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo Section */}
-                    <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity group">
-                        <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
-                            style={{ 
-                                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
-                                boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)",
-                            }}
-                        >
-                            <span className="text-sm font-bold" style={{ color: "hsl(220 30% 8%)" }}>♥</span>
-                        </div>
-                        <span className="text-xl font-bold hidden sm:inline" style={{ color: "hsl(45 90% 55%)" }}>
+                    <div className="flex items-center">
+                        <span className="text-xl font-bold" style={{ color: "hsl(45 90% 55%)" }}>
                             Marahuyo
                         </span>
-                    </Link>
+                    </div>
 
                     {/* Navigation Links - Desktop */}
                     <div className="hidden md:flex items-center gap-8">
