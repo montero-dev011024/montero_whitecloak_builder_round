@@ -361,12 +361,12 @@ export default function StreamChatInterface({
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-900">
+      <div className="flex-1 flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-500 text-white rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
             <span className="text-2xl">❌</span>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 max-w-sm mx-auto">
+          <p className="max-w-sm mx-auto" style={{ color: "hsl(220 10% 65%)" }}>
             {error}
           </p>
         </div>
@@ -376,10 +376,10 @@ export default function StreamChatInterface({
 
   if (!client || !channel) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white dark:bg-gray-900">
+      <div className="flex-1 flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
+          <p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>
             Setting up chat...
           </p>
         </div>
@@ -388,7 +388,7 @@ export default function StreamChatInterface({
   }
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
+    <div className="h-full flex flex-col" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
       <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth chat-scrollbar relative"
@@ -402,19 +402,27 @@ export default function StreamChatInterface({
             }`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl`}
+              style={
                 message.sender === "me"
-                  ? "bg-gradient-to-r from-pink-500 to-red-500 text-white"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
-              }`}
+                  ? {
+                      background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+                      color: "hsl(220 30% 8%)",
+                      boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)"
+                    }
+                  : {
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      color: "hsl(220 10% 95%)"
+                    }
+              }
             >
               <p className="text-sm">{message.text}</p>
               <p
-                className={`text-xs mt-1 ${
-                  message.sender === "me"
-                    ? "text-pink-100"
-                    : "text-gray-500 dark:text-gray-400"
-                }`}
+                className={`text-xs mt-1`}
+                style={{
+                  color: message.sender === "me" ? "rgba(0, 0, 0, 0.6)" : "hsl(220 10% 60%)"
+                }}
               >
                 {formatTime(message.timestamp)}
               </p>
@@ -424,16 +432,16 @@ export default function StreamChatInterface({
 
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-2xl">
+            <div className="px-4 py-2 rounded-2xl" style={{ backgroundColor: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.2)" }}>
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: "hsl(45 90% 55%)" }}></div>
                 <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.1s" }}
+                  className="w-2 h-2 rounded-full animate-bounce"
+                  style={{ backgroundColor: "hsl(45 90% 55%)", animationDelay: "0.1s" }}
                 ></div>
                 <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.2s" }}
+                  className="w-2 h-2 rounded-full animate-bounce"
+                  style={{ backgroundColor: "hsl(45 90% 55%)", animationDelay: "0.2s" }}
                 ></div>
               </div>
             </div>
@@ -447,7 +455,12 @@ export default function StreamChatInterface({
         <div className="absolute bottom-20 right-6 z-10">
           <button
             onClick={scrollToBottom}
-            className="bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
+            className="p-3 rounded-full transition-all duration-200 hover:scale-110"
+            style={{
+              background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+              color: "hsl(220 30% 8%)",
+              boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+            }}
             title="Scroll to bottom"
           >
             <svg
@@ -469,7 +482,7 @@ export default function StreamChatInterface({
 
       {/* Message Input */}
 
-      <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+      <div className="border-t p-4 backdrop-blur-md" style={{ borderColor: "rgba(232, 185, 96, 0.2)", backgroundColor: "rgba(20, 18, 30, 0.9)" }}>
         <form className="flex space-x-2" onSubmit={handleSendMessage}>
           <input
             type="text"
@@ -487,14 +500,24 @@ export default function StreamChatInterface({
               }
             }}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+            className="flex-1 px-4 py-2 rounded-full focus:outline-none focus:ring-2"
+            style={{
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              color: "hsl(220 10% 95%)"
+            }}
             disabled={!channel}
           />
 
           <button
             type="submit"
             disabled={!newMessage.trim() || !channel}
-            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full hover:from-pink-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="px-6 py-2 rounded-full focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            style={{
+              background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+              color: "hsl(220 30% 8%)",
+              boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)"
+            }}
           >
             <svg
               className="w-5 h-5"
@@ -514,32 +537,34 @@ export default function StreamChatInterface({
       </div>
 
       {showIncomingCall && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-sm mx-4 shadow-2xl">
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}>
+          <div className="rounded-2xl p-8 max-w-sm mx-4 backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)", boxShadow: "0 0 60px hsl(45 90% 55% / 0.2)" }}>
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-4 border-pink-500">
+              <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-4" style={{ borderColor: "hsl(45 90% 55%)", boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
                 <img
                   src={otherUser.profile_picture_url || "/default-avatar.png"}
                   alt={otherUser.full_name}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-xl font-semibold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
                 Incoming Video Call
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="mb-6" style={{ color: "hsl(220 10% 65%)" }}>
                 {callerName} is calling you
               </p>
               <div className="flex space-x-4">
                 <button
                   onClick={handleDeclineCall}
-                  className="flex-1 bg-red-500 text-white py-3 px-6 rounded-full font-semibold hover:bg-red-600 transition-colors duration-200"
+                  className="flex-1 py-3 px-6 rounded-full font-semibold transition-colors duration-200"
+                  style={{ backgroundColor: "hsl(0 70% 50%)", color: "white" }}
                 >
                   Decline
                 </button>
                 <button
                   onClick={handleAcceptCall}
-                  className="flex-1 bg-green-500 text-white py-3 px-6 rounded-full font-semibold hover:bg-green-600 transition-colors duration-200"
+                  className="flex-1 py-3 px-6 rounded-full font-semibold transition-colors duration-200"
+                  style={{ backgroundColor: "hsl(160 70% 45%)", color: "white" }}
                 >
                   Accept
                 </button>

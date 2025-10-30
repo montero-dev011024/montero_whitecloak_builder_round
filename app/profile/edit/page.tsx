@@ -197,10 +197,10 @@ setProfileDetails((prev) => {
 
     if (loading) {
         return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
     <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-        <p className="mt-4 text-gray-600 dark:text-gray-400">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
+        <p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>
         Loading profile...
         </p>
     </div>
@@ -209,29 +209,30 @@ setProfileDetails((prev) => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
     <div className="container mx-auto px-4 py-8">
     <header className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
         Edit Profile
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p style={{ color: "hsl(220 10% 65%)" }}>
         Update your profile information
         </p>
     </header>
 
     <div className="max-w-2xl mx-auto">
         <form
-        className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8"
+        className="rounded-2xl shadow-lg p-8 backdrop-blur-md"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}
         onSubmit={handleFormSubmit}
         >
         <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-            Profile Picture
+            <label className="block text-sm font-medium mb-4" style={{ color: "hsl(45 90% 55%)" }}>
+            📷 Profile Picture
             </label>
             <div className="flex items-center space-x-6">
             <div className="relative">
-                <div className="w-24 h-24 rounded-full overflow-hidden">
+                <div className="w-24 h-24 rounded-full overflow-hidden" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
                 <img
                     src={
                     formData.profile_picture_url || "/default-avatar.svg"
@@ -251,10 +252,10 @@ setProfileDetails((prev) => {
             </div>
 
             <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                <p className="text-sm mb-2" style={{ color: "hsl(220 10% 70%)" }}>
                 Upload a new profile picture
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500">
+                <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>
                 JPG, PNG or GIF. Max 5MB.
                 </p>
             </div>
@@ -266,7 +267,8 @@ setProfileDetails((prev) => {
             <div>
             <label
                 htmlFor="full_name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
             >
                 Full Name *
             </label>
@@ -277,7 +279,12 @@ setProfileDetails((prev) => {
                 value={formData.full_name}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
                 placeholder="Enter your full name"
             />
             </div>
@@ -285,7 +292,8 @@ setProfileDetails((prev) => {
             <div>
             <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
             >
                 Email
             </label>
@@ -294,7 +302,12 @@ setProfileDetails((prev) => {
                 id="email"
                 value={email}
                 disabled
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white dark:opacity-80 cursor-not-allowed"
+                className="w-full px-4 py-2 rounded-lg cursor-not-allowed opacity-60"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    color: "hsl(220 10% 80%)"
+                }}
                 placeholder="Email address"
             />
             </div>
@@ -304,7 +317,8 @@ setProfileDetails((prev) => {
             <div>
             <label
                 htmlFor="gender"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
             >
                 Gender *
             </label>
@@ -314,7 +328,12 @@ setProfileDetails((prev) => {
                 value={formData.gender}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
             >
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -326,7 +345,8 @@ setProfileDetails((prev) => {
             <div>
             <label
                 htmlFor="birthdate"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
             >
                 Birthday *
             </label>
@@ -337,7 +357,12 @@ setProfileDetails((prev) => {
                 value={formData.birthdate}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
             />
             </div>
         </div>
@@ -345,7 +370,8 @@ setProfileDetails((prev) => {
         <div className="mb-8">
             <label
             htmlFor="bio"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="block text-sm font-medium mb-2"
+            style={{ color: "hsl(45 90% 55%)" }}
             >
             About Me *
             </label>
@@ -357,17 +383,22 @@ setProfileDetails((prev) => {
             required
             rows={4}
             maxLength={500}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+            className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all resize-none"
+            style={{ 
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                color: "hsl(220 10% 95%)"
+            }}
             placeholder="Tell others about yourself..."
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs mt-1" style={{ color: "hsl(220 10% 60%)" }}>
             {formData.bio.length}/500 characters
             </p>
         </div>
 
         {/* Profile Details Section */}
-        <div className="mb-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+        <div className="mb-6 pt-6 border-t" style={{ borderColor: "rgba(232, 185, 96, 0.2)" }}>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
             Additional Details
             </h2>
             
@@ -375,9 +406,10 @@ setProfileDetails((prev) => {
             <div>
                 <label
                 htmlFor="height_cm"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
                 >
-                Height (cm)
+                📏 Height (cm)
                 </label>
                 <input
                 type="number"
@@ -387,7 +419,12 @@ setProfileDetails((prev) => {
                 onChange={handleProfileDetailsChange}
                 min="0"
                 max="300"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
                 placeholder="e.g., 170"
                 />
             </div>
@@ -395,16 +432,22 @@ setProfileDetails((prev) => {
             <div>
                 <label
                 htmlFor="relationship_goal"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
                 >
-                Relationship Goal
+                💕 Relationship Goal
                 </label>
                 <select
                 id="relationship_goal"
                 name="relationship_goal"
                 value={profileDetails.relationship_goal}
                 onChange={handleProfileDetailsChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
                 >
                 <option value="not_sure">Not sure</option>
                 <option value="something_casual">Something casual</option>
@@ -418,9 +461,10 @@ setProfileDetails((prev) => {
             <div>
                 <label
                 htmlFor="education"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
                 >
-                Education
+                🎓 Education
                 </label>
                 <input
                 type="text"
@@ -428,7 +472,12 @@ setProfileDetails((prev) => {
                 name="education"
                 value={profileDetails.education}
                 onChange={handleProfileDetailsChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
                 placeholder="e.g., Bachelor's Degree"
                 />
             </div>
@@ -436,9 +485,10 @@ setProfileDetails((prev) => {
             <div>
                 <label
                 htmlFor="occupation"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
                 >
-                Occupation
+                💼 Occupation
                 </label>
                 <input
                 type="text"
@@ -446,7 +496,12 @@ setProfileDetails((prev) => {
                 name="occupation"
                 value={profileDetails.occupation}
                 onChange={handleProfileDetailsChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
                 placeholder="e.g., Software Engineer"
                 />
             </div>
@@ -456,16 +511,22 @@ setProfileDetails((prev) => {
             <div>
                 <label
                 htmlFor="smoking"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
                 >
-                Smoking
+                🚬 Smoking
                 </label>
                 <select
                 id="smoking"
                 name="smoking"
                 value={profileDetails.smoking === null ? "" : profileDetails.smoking.toString()}
                 onChange={handleProfileDetailsChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
                 >
                 <option value="">Prefer not to say</option>
                 <option value="true">Yes</option>
@@ -476,16 +537,22 @@ setProfileDetails((prev) => {
             <div>
                 <label
                 htmlFor="drinking"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
                 >
-                Drinking
+                🍷 Drinking
                 </label>
                 <select
                 id="drinking"
                 name="drinking"
                 value={profileDetails.drinking === null ? "" : profileDetails.drinking.toString()}
                 onChange={handleProfileDetailsChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
                 >
                 <option value="">Prefer not to say</option>
                 <option value="true">Yes</option>
@@ -496,16 +563,22 @@ setProfileDetails((prev) => {
             <div>
                 <label
                 htmlFor="children"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
                 >
-                Children
+                👶 Children
                 </label>
                 <select
                 id="children"
                 name="children"
                 value={profileDetails.children}
                 onChange={handleProfileDetailsChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{ 
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
                 >
                 <option value="">Prefer not to say</option>
                 <option value="none">None</option>
@@ -518,23 +591,29 @@ setProfileDetails((prev) => {
         </div>
 
         {error && (
-            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "rgba(230, 57, 70, 0.1)", border: "1px solid rgba(230, 57, 70, 0.3)", color: "hsl(0 70% 70%)" }}>
             {error}
             </div>
         )}
 
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between pt-6 border-t" style={{ borderColor: "rgba(232, 185, 96, 0.2)" }}>
             <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+            className="px-6 py-2 transition-colors duration-200"
+            style={{ color: "hsl(220 10% 70%)" }}
             >
             Cancel
             </button>
             <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="px-6 py-2 font-semibold rounded-lg focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            style={{
+                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+                color: "hsl(220 30% 8%)",
+                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+            }}
             >
             {saving ? "Saving..." : "Save Changes"}
             </button>

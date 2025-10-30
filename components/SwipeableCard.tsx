@@ -102,22 +102,22 @@ export default function SwipeableCard({
 
     const defaultRightOverlay = (
         <div
-            className="absolute inset-0 bg-green-500/40 flex items-center justify-center pointer-events-none"
-            style={{ opacity: rightOpacity }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{ opacity: rightOpacity, backgroundColor: "rgba(16, 185, 129, 0.4)" }}
         >
-            <div className="border-4 border-green-500 rounded-2xl px-8 py-4 rotate-[-20deg]">
-                <span className="text-green-500 text-5xl font-bold">LIKE</span>
+            <div className="border-4 rounded-2xl px-8 py-4 rotate-[-20deg]" style={{ borderColor: "hsl(160 70% 50%)" }}>
+                <span className="text-5xl font-bold" style={{ color: "hsl(160 70% 50%)" }}>LIKE</span>
             </div>
         </div>
     );
 
     const defaultLeftOverlay = (
         <div
-            className="absolute inset-0 bg-red-500/40 flex items-center justify-center pointer-events-none"
-            style={{ opacity: leftOpacity }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            style={{ opacity: leftOpacity, backgroundColor: "rgba(230, 57, 70, 0.4)" }}
         >
-            <div className="border-4 border-red-500 rounded-2xl px-8 py-4 rotate-[20deg]">
-                <span className="text-red-500 text-5xl font-bold">NOPE</span>
+            <div className="border-4 rounded-2xl px-8 py-4 rotate-[20deg]" style={{ borderColor: "hsl(0 70% 50%)" }}>
+                <span className="text-5xl font-bold" style={{ color: "hsl(0 70% 50%)" }}>NOPE</span>
             </div>
         </div>
     );
@@ -154,8 +154,8 @@ export default function SwipeableCard({
                 )}
 
                 {!isDragging && dragOffset.x === 0 && (
-                    <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full pointer-events-none z-10">
-                        <p className="text-white text-xs font-medium">Swipe left or right</p>
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 backdrop-blur-sm px-4 py-2 rounded-full pointer-events-none z-10" style={{ backgroundColor: "rgba(232, 185, 96, 0.2)", border: "1px solid rgba(232, 185, 96, 0.4)" }}>
+                        <p className="text-xs font-medium" style={{ color: "hsl(45 90% 65%)" }}>Swipe left or right</p>
                     </div>
                 )}
             </div>

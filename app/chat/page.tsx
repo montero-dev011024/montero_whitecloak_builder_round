@@ -72,10 +72,10 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
+          <p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>
             Loading your matches...
           </p>
         </div>
@@ -84,53 +84,58 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
             Messages
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p style={{ color: "hsl(220 10% 65%)" }}>
             {chats.length} conversation{chats.length !== 1 ? "s" : ""}
           </p>
         </header>
 
         {chats.length === 0 ? (
           <div className="text-center max-w-md mx-auto p-8">
-            <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
               <span className="text-4xl">💬</span>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
               No conversations yet
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="mb-6" style={{ color: "hsl(220 10% 65%)" }}>
               Start swiping to find matches and begin conversations!
             </p>
             <Link
-              href="/matches"
-              className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
+              href="/discover"
+              className="inline-block font-semibold py-3 px-6 rounded-full transition-all duration-200"
+              style={{
+                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+                color: "hsl(220 30% 8%)",
+                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+              }}
             >
               Start Swiping
             </Link>
           </div>
         ) : (
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+            <div className="rounded-2xl shadow-lg overflow-hidden backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
               {chats.map((chat, key) => (
                 <Link
                   key={key}
                   href={`/chat/${chat.id}`}
-                  className="block hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  className="block hover:bg-white/10 transition-colors duration-200"
                 >
-                  <div className="flex items-center p-6 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="flex items-center p-6 border-b last:border-b-0" style={{ borderColor: "rgba(255, 255, 255, 0.1)" }}>
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
                       <img
                         src={chat.user.profile_picture_url || "/default-avatar.png"}
                         alt={chat.user.full_name}
                         className="w-full h-full object-cover"
                       />
                       {chat.unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                        <div className="absolute -top-1 -right-1 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold" style={{ backgroundColor: "hsl(0 70% 60%)" }}>
                           {chat.unreadCount}
                         </div>
                       )}
@@ -138,15 +143,15 @@ export default function ChatPage() {
 
                     <div className="flex-1 min-w-0 ml-4">
                       <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                        <h3 className="text-lg font-semibold truncate" style={{ color: "hsl(45 90% 55%)" }}>
                           {chat.user.full_name}
                         </h3>
-                        <span className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
+                        <span className="text-sm flex-shrink-0" style={{ color: "hsl(220 10% 60%)" }}>
                           {formatTime(chat.lastMessageTime)}
                         </span>
                       </div>
 
-                      <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                      <p className="text-sm truncate" style={{ color: "hsl(220 10% 65%)" }}>
                         {chat.lastMessage}
                       </p>
                     </div>

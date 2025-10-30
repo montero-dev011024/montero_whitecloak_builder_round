@@ -61,11 +61,16 @@
             type="button"
             onClick={handleClick}
             disabled={uploading}
-            className="absolute bottom-0 right-0 bg-pink-500 text-white p-2 rounded-full hover:bg-pink-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute bottom-0 right-0 p-2 rounded-full hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+                color: "hsl(220 30% 8%)",
+                boxShadow: "0 0 20px hsl(45 90% 55% / 0.5)"
+            }}
             title="Change photo"
         >
             {uploading ? (
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: "hsl(220 30% 8%)" }}></div>
             ) : (
             <svg
                 className="w-4 h-4"

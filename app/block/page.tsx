@@ -57,61 +57,51 @@ export default function BlockedUsersPage() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+			<div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
 				<div className="text-center">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto" />
-					<p className="mt-4 text-gray-600 dark:text-gray-400">Loading blocked users...</p>
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }} />
+					<p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>Loading blocked users...</p>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+		<div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
 			<div className="container mx-auto px-4 py-8">
 				<header className="mb-8">
 					<div className="flex items-center justify-between mb-4">
-						<button
-							onClick={() => router.back()}
-							className="p-2 rounded-full hover:bg-white/20 dark:hover:bg-gray-700/50 transition-colors duration-200"
-							title="Go back"
-						>
-							<svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-							</svg>
-						</button>
 						<div className="flex-1" />
 					</div>
-
 					<div className="text-center">
-						<h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Blocked Users</h1>
-						<p className="text-gray-600 dark:text-gray-400">
+						<h1 className="text-3xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>🚫 Blocked Users</h1>
+						<p style={{ color: "hsl(220 10% 65%)" }}>
 							Manage who cannot interact with you on Marahuyo
 						</p>
 					</div>
 				</header>
 
 				{feedback && (
-					<div className="max-w-2xl mx-auto mb-6 rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200">
+					<div className="max-w-2xl mx-auto mb-6 rounded-xl border px-4 py-3 text-sm font-medium" style={{ borderColor: "rgba(16, 185, 129, 0.3)", backgroundColor: "rgba(16, 185, 129, 0.1)", color: "hsl(160 70% 70%)" }}>
 						{feedback}
 					</div>
 				)}
 
 				{error && (
-					<div className="max-w-2xl mx-auto mb-6 rounded-xl border border-red-200 bg-red-50/80 px-4 py-3 text-sm font-medium text-red-800 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
+					<div className="max-w-2xl mx-auto mb-6 rounded-xl border px-4 py-3 text-sm font-medium" style={{ borderColor: "rgba(230, 57, 70, 0.3)", backgroundColor: "rgba(230, 57, 70, 0.1)", color: "hsl(0 70% 70%)" }}>
 						{error}
 					</div>
 				)}
 
 				{blockedUsers.length === 0 ? (
-					<div className="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
-						<div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full border-2 border-dashed border-gray-200 dark:border-gray-700">
-							<svg className="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c1.105 0 2-.672 2-1.5S13.105 8 12 8s-2 .672-2 1.5.895 1.5 2 1.5zm0 0v2m0 4h.01M5.934 9c.37-3.122 2.612-5.5 6.066-5.5 3.455 0 5.696 2.378 6.066 5.5C18.387 9 19 9.896 19 11v2c0 .874-.108 1.735-.32 2.566-.167.667-.744 1.1-1.428 1.1H6.748c-.684 0-1.261-.433-1.428-1.1A10.907 10.907 0 015 13v-2c0-1.104.613-2 1.066-2z" />
+					<div className="max-w-xl mx-auto rounded-2xl shadow-lg p-8 text-center backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+						<div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full border-2 border-dashed" style={{ borderColor: "rgba(232, 185, 96, 0.3)" }}>
+							<svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "hsl(45 90% 55%)" }}>
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
 							</svg>
 						</div>
-						<h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">No blocked users</h2>
-						<p className="text-gray-600 dark:text-gray-400">
+						<h2 className="text-2xl font-semibold mb-2" style={{ color: "hsl(45 90% 55%)" }}>No blocked users</h2>
+						<p style={{ color: "hsl(220 10% 65%)" }}>
 							Users you block will appear here. You can unblock them anytime if you change your mind.
 						</p>
 					</div>
@@ -124,10 +114,11 @@ export default function BlockedUsersPage() {
 							return (
 								<div
 									key={blockedUser.id}
-									className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
+									className="rounded-2xl shadow-lg p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 backdrop-blur-md"
+									style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}
 								>
 									<div className="flex items-start sm:items-center gap-4">
-										<div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+										<div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
 											<Image
 												src={avatarSrc}
 												alt={blockedUser.full_name}
@@ -138,18 +129,18 @@ export default function BlockedUsersPage() {
 										</div>
 
 										<div className="space-y-1">
-											<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+											<h3 className="text-lg font-semibold" style={{ color: "hsl(45 90% 55%)" }}>
 												{blockedUser.full_name}, {calculateAge(blockedUser.birthdate)}
 											</h3>
 											{blockedUser.occupation && (
-												<p className="text-sm text-gray-500 dark:text-gray-400">{blockedUser.occupation}</p>
+												<p className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>💼 {blockedUser.occupation}</p>
 											)}
-											<p className="text-sm text-gray-500 dark:text-gray-400">
-												Blocked on {blockedDate.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
+											<p className="text-sm" style={{ color: "hsl(220 10% 60%)" }}>
+												📅 Blocked on {blockedDate.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}
 											</p>
 											{blockedUser.reason && (
-												<p className="text-sm text-gray-600 dark:text-gray-300">
-													Reason: {blockedUser.reason}
+												<p className="text-sm" style={{ color: "hsl(220 10% 70%)" }}>
+													💬 Reason: {blockedUser.reason}
 												</p>
 											)}
 										</div>
@@ -158,12 +149,12 @@ export default function BlockedUsersPage() {
 									<button
 										onClick={() => handleUnblock(blockedUser.id, blockedUser.full_name)}
 										disabled={isPending}
-										className="inline-flex items-center justify-center rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-emerald-300 hover:text-emerald-600 disabled:opacity-60 dark:border-gray-600 dark:text-gray-200 dark:hover:border-emerald-500 dark:hover:text-emerald-300"
+										className="inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition-all hover:bg-white/10 disabled:opacity-60"
+										style={{ borderColor: "rgba(16, 185, 129, 0.5)", color: "hsl(160 70% 60%)" }}
 										title={`Unblock ${blockedUser.full_name}`}
 									>
 										<svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 12a6 6 0 11-6-6" />
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l3 3" />
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
 										</svg>
 										Unblock
 									</button>

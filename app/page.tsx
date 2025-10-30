@@ -1,65 +1,130 @@
+"use client";
+
+import Link from "next/link";
 import Image from "next/image";
+import { useAuth } from "@/contexts/auth-contexts";
+import { useState, useEffect } from "react";
+
+interface Star {
+  left: number;
+  top: number;
+  delay: number;
+  opacity: number;
+}
 
 export default function Home() {
+  const { user } = useAuth();
+  const [stars, setStars] = useState<Star[]>([]);
+
+  useEffect(() => {
+    // Generate stars only on client side to avoid hydration mismatch
+    const generatedStars = [...Array(50)].map(() => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      delay: Math.random() * 3,
+      opacity: Math.random() * 0.7 + 0.3,
+    }));
+    setStars(generatedStars);
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+      {/* Animated stars background */}
+      <div className="absolute inset-0">
+        {stars.map((star, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 rounded-full animate-pulse"
+            style={{
+              left: `${star.left}%`,
+              top: `${star.top}%`,
+              animationDelay: `${star.delay}s`,
+              opacity: star.opacity,
+              backgroundColor: "hsl(45 100% 95%)",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10 container mx-auto px-4 py-20 text-center">
+        <div className="max-w-4xl mx-auto">
+          {/* Logo */}
+          <div className="mb-8 animate-bounce">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+              src="/marahuyo.png"
+              alt="Marahuyo - Where Hearts Find Their Cosmic Connection"
+              width={256}
+              height={256}
+              priority
+              className="mx-auto"
+              style={{
+                filter: "drop-shadow(0 0 40px hsl(45 90% 55% / 0.3))",
+              }}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight" style={{ color: "hsl(45 90% 55%)" }}>
+            Where Hearts Find Their Cosmic Connection
+          </h1>
+
+          {/* Subheadline */}
+          <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto" style={{ color: "hsl(220 10% 65%)" }}>
+            Experience the magic of destiny-driven dating. Let the stars guide you to your perfect match.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Link
+              href="/auth"
+              className="flex items-center justify-center gap-2 px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 group"
+              style={{
+                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+                color: "hsl(220 30% 8%)",
+                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)",
+              }}
+            >
+              <svg className="h-5 w-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              Start Your Journey
+            </Link>
+            
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12 border-t" style={{ borderColor: "hsl(220 20% 20%)" }}>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
+                10K+
+              </div>
+              <div className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
+                Enchanted Souls
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "hsl(200 60% 50%)" }}>
+                5K+
+              </div>
+              <div className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
+                Cosmic Matches
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "hsl(340 80% 65%)" }}>
+                98%
+              </div>
+              <div className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
+                Success Rate
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {/* Bottom gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32" style={{ background: "linear-gradient(to top, hsl(220 30% 8%), transparent)" }} />
+    </section>
   );
 }

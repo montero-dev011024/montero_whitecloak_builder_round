@@ -11,15 +11,16 @@ interface ChatHeaderProps {
 export default function ChatHeader({ user, onVideoCall }: ChatHeaderProps) {
   const router = useRouter();
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+    <div className="border-b px-6 py-4 backdrop-blur-md" style={{ backgroundColor: "rgba(20, 18, 30, 0.9)", borderColor: "rgba(232, 185, 96, 0.2)" }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
             onClick={() => router.back()}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            className="p-2 rounded-full hover:bg-white/10 transition-colors duration-200"
+            style={{ color: "hsl(45 90% 55%)" }}
           >
             <svg
-              className="w-6 h-6 text-gray-600 dark:text-gray-400"
+              className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -34,22 +35,22 @@ export default function ChatHeader({ user, onVideoCall }: ChatHeaderProps) {
           </button>
 
           <div className="flex items-center space-x-3">
-            <div className="relative w-12 h-12 rounded-full overflow-hidden">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
               <img
                 src={user.profile_picture_url || "/default-avatar.png"}
                 alt={user.full_name}
                 className="w-full h-full object-cover"
               />
               {user.is_online && (
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
+                <div className="absolute bottom-0 right-0 w-3 h-3 border-2 rounded-full" style={{ backgroundColor: "hsl(160 70% 50%)", borderColor: "rgba(20, 18, 30, 0.9)" }}></div>
               )}
             </div>
 
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold" style={{ color: "hsl(45 90% 55%)" }}>
                 {user.full_name}, {calculateAge(user.birthdate)}
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
                 {user.is_online ? "Active now" : "Offline"}
               </p>
             </div>
@@ -59,7 +60,12 @@ export default function ChatHeader({ user, onVideoCall }: ChatHeaderProps) {
         <div className="flex items-center space-x-2">
           <button
             onClick={onVideoCall}
-            className="p-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="p-3 rounded-full transition-all duration-200"
+            style={{
+              background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+              color: "hsl(220 30% 8%)",
+              boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)"
+            }}
             title="Start Video Call"
           >
             <svg

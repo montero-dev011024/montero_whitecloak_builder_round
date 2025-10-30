@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Cosmic color palette inspired by the Marahuyo logo */
+    --background: 220 30% 8%;
+    --foreground: 45 100% 95%;
+
+    --card: 220 28% 12%;
+    --card-foreground: 45 100% 95%;
+
+    --popover: 220 28% 12%;
+    --popover-foreground: 45 100% 95%;
+
+    /* Warm golden primary from logo */
+    --primary: 45 90% 55%;
+    --primary-foreground: 220 30% 8%;
+
+    /* Cool ethereal secondary */
+    --secondary: 200 60% 50%;
+    --secondary-foreground: 220 30% 8%;
+
+    --muted: 220 20% 20%;
+    --muted-foreground: 220 10% 65%;
+
+    /* Purple accent from logo */
+    --accent: 270 60% 60%;
+    --accent-foreground: 45 100% 95%;
+
+    /* Pink heart accent */
+    --romantic: 340 80% 65%;
+    --romantic-foreground: 220 30% 8%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 45 100% 95%;
+
+    --border: 220 20% 20%;
+    --input: 220 20% 20%;
+    --ring: 45 90% 55%;
+
+    --radius: 0.75rem;
+
+    /* Gradient definitions */
+    --gradient-cosmic: linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%));
+    --gradient-warm: linear-gradient(135deg, hsl(25 85% 55%), hsl(45 90% 55%));
+    --gradient-cool: linear-gradient(135deg, hsl(200 60% 50%), hsl(270 60% 60%));
+    --gradient-hero: linear-gradient(180deg, hsl(220 30% 8% / 0.95), hsl(270 40% 15% / 0.98));
+
+    /* Shadow effects */
+    --shadow-glow-warm: 0 0 40px hsl(45 90% 55% / 0.3);
+    --shadow-glow-cool: 0 0 40px hsl(200 60% 50% / 0.3);
+    --shadow-glow-accent: 0 0 30px hsl(270 60% 60% / 0.4);
+
+    /* Animations */
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --sidebar-background: 220 28% 10%;
+    --sidebar-foreground: 45 100% 95%;
+    --sidebar-primary: 45 90% 55%;
+    --sidebar-primary-foreground: 220 30% 8%;
+    --sidebar-accent: 220 20% 18%;
+    --sidebar-accent-foreground: 45 100% 95%;
+    --sidebar-border: 220 20% 20%;
+    --sidebar-ring: 45 90% 55%;
+  }
+
+  .dark {
+    --background: 220 30% 8%;
+    --foreground: 45 100% 95%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Cosmic background animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  33% { transform: translateY(-20px) translateX(10px); }
+  66% { transform: translateY(-10px) translateX(-10px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 10px hsl(45 90% 55% / 0.5)); }
+  50% { filter: drop-shadow(0 0 20px hsl(45 90% 55% / 0.8)); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}

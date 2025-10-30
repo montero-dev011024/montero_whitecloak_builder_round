@@ -88,10 +88,10 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
+          <p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>
             Loading your profile...
           </p>
         </div>
@@ -101,20 +101,25 @@ export default function ProfilePage() {
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
         <div className="text-center max-w-md mx-auto p-8">
-          <div className="w-24 h-24 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
             <span className="text-4xl">❌</span>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
             Profile not found
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="mb-6" style={{ color: "hsl(220 10% 65%)" }}>
             {error || "Unable to load your profile. Please try again."}
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
+            className="font-semibold py-3 px-6 rounded-full transition-all duration-200"
+            style={{
+              background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+              color: "hsl(220 30% 8%)",
+              boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+            }}
           >
             Retry
           </button>
@@ -124,13 +129,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
             My Profile
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p style={{ color: "hsl(220 10% 65%)" }}>
             Manage your profile and preferences
           </p>
         </header>
@@ -138,10 +143,10 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+              <div className="rounded-2xl shadow-lg p-8 backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
                 <div className="flex items-center space-x-6 mb-8">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full overflow-hidden">
+                    <div className="w-24 h-24 rounded-full overflow-hidden" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
                       <img
                         src={profile.profile_picture_url || "/default-avatar.svg"}
                         alt={profile.full_name}
@@ -151,13 +156,13 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                    <h2 className="text-2xl font-bold mb-1" style={{ color: "hsl(45 90% 55%)" }}>
                       {profile.full_name}, {calculateAge(profile.birthdate)}
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="mb-2" style={{ color: "hsl(220 10% 65%)" }}>
                       {profile.email}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                    <p className="text-sm" style={{ color: "hsl(220 10% 60%)" }}>
                       Member since{" "}
                       {new Date(profile.created_at).toLocaleDateString()}
                     </p>
@@ -166,32 +171,32 @@ export default function ProfilePage() {
 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                    <h3 className="text-lg font-semibold mb-3" style={{ color: "hsl(45 90% 55%)" }}>
                       About Me
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p className="leading-relaxed" style={{ color: "hsl(220 10% 70%)" }}>
                       {profile.bio || "No bio added yet."}
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                    <h3 className="text-lg font-semibold mb-3" style={{ color: "hsl(45 90% 55%)" }}>
                       Basic Information
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
                           Gender
                         </label>
-                        <p className="text-gray-900 dark:text-white capitalize">
+                        <p className="capitalize" style={{ color: "hsl(220 10% 95%)" }}>
                           {profile.gender.replace(/_/g, " ")}
                         </p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
                           Birthday
                         </label>
-                        <p className="text-gray-900 dark:text-white">
+                        <p style={{ color: "hsl(220 10% 95%)" }}>
                           {new Date(profile.birthdate).toLocaleDateString()}
                         </p>
                       </div>
@@ -202,76 +207,76 @@ export default function ProfilePage() {
                   {(profile.height_cm || profile.education || profile.occupation || 
                     profile.smoking !== null || profile.drinking !== null || profile.children) && (
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      <h3 className="text-lg font-semibold mb-3" style={{ color: "hsl(45 90% 55%)" }}>
                         Additional Details
                       </h3>
                       <div className="grid grid-cols-2 gap-4">
                         {profile.height_cm && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Height
+                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                              📏 Height
                             </label>
-                            <p className="text-gray-900 dark:text-white">
+                            <p style={{ color: "hsl(220 10% 95%)" }}>
                               {profile.height_cm} cm
                             </p>
                           </div>
                         )}
                         {profile.relationship_goal && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Looking for
+                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                              💕 Looking for
                             </label>
-                            <p className="text-gray-900 dark:text-white capitalize">
+                            <p className="capitalize" style={{ color: "hsl(220 10% 95%)" }}>
                               {profile.relationship_goal.replace(/_/g, " ")}
                             </p>
                           </div>
                         )}
                         {profile.education && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Education
+                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                              🎓 Education
                             </label>
-                            <p className="text-gray-900 dark:text-white">
+                            <p style={{ color: "hsl(220 10% 95%)" }}>
                               {profile.education}
                             </p>
                           </div>
                         )}
                         {profile.occupation && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Occupation
+                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                              💼 Occupation
                             </label>
-                            <p className="text-gray-900 dark:text-white">
+                            <p style={{ color: "hsl(220 10% 95%)" }}>
                               {profile.occupation}
                             </p>
                           </div>
                         )}
                         {profile.smoking !== null && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Smoking
+                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                              🚬 Smoking
                             </label>
-                            <p className="text-gray-900 dark:text-white">
+                            <p style={{ color: "hsl(220 10% 95%)" }}>
                               {profile.smoking ? "Yes" : "No"}
                             </p>
                           </div>
                         )}
                         {profile.drinking !== null && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Drinking
+                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                              🍷 Drinking
                             </label>
-                            <p className="text-gray-900 dark:text-white">
+                            <p style={{ color: "hsl(220 10% 95%)" }}>
                               {profile.drinking ? "Yes" : "No"}
                             </p>
                           </div>
                         )}
                         {profile.children && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Children
+                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                              👶 Children
                             </label>
-                            <p className="text-gray-900 dark:text-white capitalize">
+                            <p className="capitalize" style={{ color: "hsl(220 10% 95%)" }}>
                               {profile.children.replace(/_/g, " ")}
                             </p>
                           </div>
@@ -285,22 +290,23 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-6">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="rounded-2xl shadow-lg p-6 backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
                   Quick Actions
                 </h3>
                 <div className="space-y-3">
                   <Link
                     href="/profile/edit"
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                    className="flex items-center justify-between p-3 rounded-lg hover:bg-white/10 transition-colors duration-200"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                         <svg
-                          className="w-4 h-4 text-white"
+                          className="w-4 h-4"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
+                          style={{ color: "hsl(220 30% 8%)" }}
                         >
                           <path
                             strokeLinecap="round"
@@ -310,15 +316,16 @@ export default function ProfilePage() {
                           />
                         </svg>
                       </div>
-                      <span className="text-gray-900 dark:text-white">
+                      <span style={{ color: "hsl(220 10% 95%)" }}>
                         Edit Profile
                       </span>
                     </div>
                     <svg
-                      className="w-5 h-5 text-gray-400"
+                      className="w-5 h-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      style={{ color: "hsl(220 10% 60%)" }}
                     >
                       <path
                         strokeLinecap="round"
@@ -331,16 +338,16 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="rounded-2xl shadow-lg p-6 backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
                   Account
                 </h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700">
-                    <span className="text-gray-900 dark:text-white">
+                  <div className="flex flex-col p-3 rounded-lg" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}>
+                    <span className="text-sm font-medium mb-2" style={{ color: "hsl(220 10% 65%)" }}>
                       Email
                     </span>
-                    <span className="text-gray-500 dark:text-gray-400">
+                    <span className="break-all text-sm" style={{ color: "hsl(220 10% 95%)" }}>
                       {profile.email}
                     </span>
                   </div>

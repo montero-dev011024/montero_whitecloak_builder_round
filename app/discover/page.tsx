@@ -243,10 +243,10 @@
 
         if (loading) {
             return (
-                <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+                <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto" />
-                        <p className="mt-4 text-gray-600 dark:text-gray-400">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }} />
+                        <p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>
                             Finding your matches...
                         </p>
                     </div>
@@ -255,56 +255,37 @@
         }
 
         return (
-            <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+            <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
                 <div className="container mx-auto px-4 py-8 pb-20">
                     <header className="mb-8">
                         <div className="flex items-center justify-between mb-4">
-                            <button
-                                onClick={() => router.back()}
-                                className="p-2 rounded-full hover:bg-white/20 dark:hover:bg-gray-700/50 transition-colors duration-200"
-                                title="Go back"
-                            >
-                                <svg
-                                    className="w-6 h-6 text-gray-700 dark:text-gray-300"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M15 19l-7-7 7-7"
-                                    />
-                                </svg>
-                            </button>
-                            <div className="flex-1" />
                         </div>
 
                         <div className="text-center">
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            <h1 className="text-3xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
                                 Discover Matches
                             </h1>
-                            <p className="text-gray-600 dark:text-gray-400">
+                            <p style={{ color: "hsl(220 10% 65%)" }}>
                                 {Math.min(currentIndex + 1, potentialMatches.length)} of {potentialMatches.length} profiles
                             </p>
                         </div>
                     </header>
 
                     <section className="max-w-2xl mx-auto mb-10">
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                        <div className="rounded-2xl shadow-lg overflow-hidden backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
                             <button
                                 type="button"
                                 onClick={() => setPreferencesExpanded(!preferencesExpanded)}
-                                className="w-full flex items-center justify-between p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+                                className="w-full flex items-center justify-between p-6 hover:bg-white/10 transition-colors duration-200"
                             >
                                 <div className="flex items-center space-x-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-red-500 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                                         <svg
-                                            className="w-5 h-5 text-white"
+                                            className="w-5 h-5"
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
+                                            style={{ color: "hsl(220 30% 8%)" }}
                                         >
                                             <path
                                                 strokeLinecap="round"
@@ -315,27 +296,28 @@
                                         </svg>
                                     </div>
                                     <div className="text-left">
-                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                                        <h2 className="text-xl font-semibold" style={{ color: "hsl(45 90% 55%)" }}>
                                             Discovery Preferences
                                         </h2>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        <p className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
                                             {preferencesExpanded ? "Click to collapse" : "Click to expand and customize"}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     {preferencesDirty && (
-                                        <span className="px-2 py-1 text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded-full">
+                                        <span className="px-2 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: "rgba(234, 179, 8, 0.2)", color: "hsl(45 90% 70%)" }}>
                                             Unsaved
                                         </span>
                                     )}
                                     <svg
-                                        className={`w-6 h-6 text-gray-400 transition-transform duration-200 ${
+                                        className={`w-6 h-6 transition-transform duration-200 ${
                                             preferencesExpanded ? "rotate-180" : ""
                                         }`}
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
+                                        style={{ color: "hsl(220 10% 60%)" }}
                                     >
                                         <path
                                             strokeLinecap="round"
@@ -349,12 +331,12 @@
 
                             {preferencesExpanded && (
                                 <div className="px-6 pb-6 space-y-6 animate-in fade-in duration-200">
-                                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent" />
+                                    <div className="h-px" style={{ background: "linear-gradient(to right, transparent, rgba(232, 185, 96, 0.3), transparent)" }} />
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                Preferred Age Range
+                                            <label className="block text-sm font-medium mb-2" style={{ color: "hsl(45 90% 55%)" }}>
+                                                🎂 Preferred Age Range
                                             </label>
                                             <div className="space-y-3">
                                                 <div className="flex items-center space-x-3">
@@ -365,10 +347,15 @@
                                                         max={preferences.age_range.max}
                                                         value={preferences.age_range.min}
                                                         onChange={handlePreferencesChange}
-                                                        className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                                                        className="flex-1 px-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 transition-all"
+                                                        style={{ 
+                                                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                            color: "hsl(220 10% 95%)"
+                                                        }}
                                                         placeholder="Min"
                                                     />
-                                                    <span className="text-gray-400">to</span>
+                                                    <span style={{ color: "hsl(220 10% 60%)" }}>to</span>
                                                     <input
                                                         type="number"
                                                         name="age_range_max"
@@ -376,13 +363,18 @@
                                                         max="100"
                                                         value={preferences.age_range.max}
                                                         onChange={handlePreferencesChange}
-                                                        className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                                                        className="flex-1 px-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 transition-all"
+                                                        style={{ 
+                                                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                            color: "hsl(220 10% 95%)"
+                                                        }}
                                                         placeholder="Max"
                                                     />
                                                 </div>
-                                                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                                                <div className="flex justify-between text-xs" style={{ color: "hsl(220 10% 60%)" }}>
                                                     <span>Min: 18</span>
-                                                    <span className="font-medium text-pink-600 dark:text-pink-400">
+                                                    <span className="font-medium" style={{ color: "hsl(45 90% 55%)" }}>
                                                         {preferences.age_range.min} - {preferences.age_range.max} years
                                                     </span>
                                                     <span>Max: 100</span>
@@ -393,9 +385,10 @@
                                         <div>
                                             <label
                                                 htmlFor="distance_miles"
-                                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                                                className="block text-sm font-medium mb-2"
+                                                style={{ color: "hsl(45 90% 55%)" }}
                                             >
-                                                Maximum Distance
+                                                📍 Maximum Distance
                                             </label>
                                             <div className="space-y-3">
                                                 <input
@@ -406,11 +399,16 @@
                                                     max="500"
                                                     value={preferences.distance_miles}
                                                     onChange={handlePreferencesChange}
-                                                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-all"
+                                                    className="w-full px-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 transition-all"
+                                                    style={{ 
+                                                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                        color: "hsl(220 10% 95%)"
+                                                    }}
                                                 />
-                                                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                                                <div className="flex justify-between text-xs" style={{ color: "hsl(220 10% 60%)" }}>
                                                     <span>1 mile</span>
-                                                    <span className="font-medium text-pink-600 dark:text-pink-400">
+                                                    <span className="font-medium" style={{ color: "hsl(45 90% 55%)" }}>
                                                         Within {preferences.distance_miles} miles
                                                     </span>
                                                     <span>500 miles</span>
@@ -421,8 +419,8 @@
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                                Gender Preferences
+                                            <label className="block text-sm font-medium mb-3" style={{ color: "hsl(45 90% 55%)" }}>
+                                                👥 Gender Preferences
                                             </label>
                                             <div className="flex flex-wrap gap-2">
                                                 {genderPreferenceOptions.map((option) => {
@@ -435,23 +433,30 @@
                                                             onClick={() => toggleGenderPreference(option)}
                                                             className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl border-2 transition-all duration-200 ${
                                                                 checked
-                                                                    ? "border-pink-500 bg-gradient-to-r from-pink-50 to-red-50 dark:from-pink-500/20 dark:to-red-500/20 shadow-sm"
-                                                                    : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                                                                    ? "shadow-sm"
+                                                                    : "hover:bg-white/5"
                                                             }`}
+                                                            style={{
+                                                                borderColor: checked ? "hsl(45 90% 55%)" : "rgba(255, 255, 255, 0.2)",
+                                                                backgroundColor: checked ? "rgba(232, 185, 96, 0.1)" : "transparent"
+                                                            }}
                                                         >
                                                             <div
                                                                 className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
-                                                                    checked
-                                                                        ? "border-pink-500 bg-gradient-to-r from-pink-500 to-red-500"
-                                                                        : "border-gray-300 dark:border-gray-600"
+                                                                    checked ? "" : ""
                                                                 }`}
+                                                                style={{
+                                                                    borderColor: checked ? "hsl(45 90% 55%)" : "rgba(255, 255, 255, 0.3)",
+                                                                    background: checked ? "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" : "transparent"
+                                                                }}
                                                             >
                                                                 {checked && (
                                                                     <svg
-                                                                        className="w-3.5 h-3.5 text-white"
+                                                                        className="w-3.5 h-3.5"
                                                                         fill="none"
                                                                         stroke="currentColor"
                                                                         viewBox="0 0 24 24"
+                                                                        style={{ color: "hsl(220 30% 8%)" }}
                                                                     >
                                                                         <path
                                                                             strokeLinecap="round"
@@ -463,11 +468,8 @@
                                                                 )}
                                                             </div>
                                                             <span
-                                                                className={`text-sm font-medium capitalize ${
-                                                                    checked
-                                                                        ? "text-gray-900 dark:text-white"
-                                                                        : "text-gray-600 dark:text-gray-400"
-                                                                }`}
+                                                                className={`text-sm font-medium capitalize`}
+                                                                style={{ color: checked ? "hsl(45 90% 55%)" : "hsl(220 10% 70%)" }}
                                                             >
                                                                 {option.replace(/_/g, " ")}
                                                             </span>
@@ -480,18 +482,22 @@
                                         <div>
                                             <label
                                                 htmlFor="relationship_goal"
-                                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
+                                                className="block text-sm font-medium mb-3"
+                                                style={{ color: "hsl(45 90% 55%)" }}
                                             >
-                                                Relationship Goal
+                                                💕 Relationship Goal
                                             </label>
                                             <select
                                                 id="relationship_goal"
                                                 name="relationship_goal"
                                                 value={preferences.relationship_goal}
                                                 onChange={handlePreferencesChange}
-                                                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white appearance-none bg-no-repeat bg-right pr-10 transition-all"
+                                                className="w-full px-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 appearance-none bg-no-repeat bg-right pr-10 transition-all"
                                                 style={{
-                                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                                                    color: "hsl(220 10% 95%)",
+                                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23E8B960'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                                                     backgroundSize: "1.5rem",
                                                     backgroundPosition: "right 0.75rem center",
                                                 }}
@@ -505,12 +511,13 @@
                                     </div>
 
                                     {preferencesError && (
-                                        <div className="flex items-start space-x-2 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                                        <div className="flex items-start space-x-2 p-4 rounded-xl" style={{ backgroundColor: "rgba(230, 57, 70, 0.1)", border: "1px solid rgba(230, 57, 70, 0.3)" }}>
                                             <svg
-                                                className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5"
+                                                className="w-5 h-5 flex-shrink-0 mt-0.5"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 viewBox="0 0 24 24"
+                                                style={{ color: "hsl(0 70% 60%)" }}
                                             >
                                                 <path
                                                     strokeLinecap="round"
@@ -519,12 +526,12 @@
                                                     d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                                                 />
                                             </svg>
-                                            <p className="text-sm text-red-700 dark:text-red-300">{preferencesError}</p>
+                                            <p className="text-sm" style={{ color: "hsl(0 70% 70%)" }}>{preferencesError}</p>
                                         </div>
                                     )}
 
                                     <div className="flex items-center justify-between pt-2">
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                        <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>
                                             {preferencesDirty
                                                 ? "You have unsaved changes"
                                                 : "All changes saved"}
@@ -533,15 +540,21 @@
                                             type="button"
                                             onClick={handleSavePreferences}
                                             disabled={!preferencesDirty || preferencesSaving}
-                                            className="px-6 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-r from-pink-500 to-red-500 text-white hover:from-pink-600 hover:to-red-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-pink-500 disabled:hover:to-red-500 transition-all duration-200 shadow-lg shadow-pink-500/30 hover:shadow-xl hover:shadow-pink-500/40"
+                                            className="px-6 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                                            style={{
+                                                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+                                                color: "hsl(220 30% 8%)",
+                                                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+                                            }}
                                         >
                                             {preferencesSaving ? (
                                                 <span className="flex items-center space-x-2">
                                                     <svg
-                                                        className="animate-spin h-4 w-4 text-white"
+                                                        className="animate-spin h-4 w-4"
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         fill="none"
                                                         viewBox="0 0 24 24"
+                                                        style={{ color: "hsl(220 30% 8%)" }}
                                                     >
                                                         <circle
                                                             className="opacity-25"
@@ -579,19 +592,24 @@
                                 />
                             </>
                         ) : (
-                            <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
-                                <div className="w-24 h-24 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div className="text-center max-w-md mx-auto p-8 rounded-2xl shadow-lg backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                                <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                                     <span className="text-4xl">💕</span>
                                 </div>
-                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                                <h2 className="text-2xl font-bold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
                                     No more profiles to show
                                 </h2>
-                                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                <p className="mb-6" style={{ color: "hsl(220 10% 65%)" }}>
                                     Adjust your discovery preferences above or check back later for new matches.
                                 </p>
                                 <button
                                     onClick={loadMatches}
-                                    className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
+                                    className="font-semibold py-3 px-6 rounded-full transition-all duration-200"
+                                    style={{
+                                        background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+                                        color: "hsl(220 30% 8%)",
+                                        boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+                                    }}
                                 >
                                     Refresh
                                 </button>

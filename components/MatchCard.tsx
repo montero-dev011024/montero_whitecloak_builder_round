@@ -154,15 +154,16 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                 >
-                    <div className="card-swipe aspect-[3/4] bg-gradient-to-br from-pink-100 to-red-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-2xl overflow-hidden cursor-pointer">
+                    <div className="card-swipe aspect-[3/4] rounded-2xl shadow-2xl overflow-hidden cursor-pointer backdrop-blur-md" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))", border: "1px solid rgba(232, 185, 96, 0.3)" }}>
                         <div className="relative w-full h-full p-6 overflow-y-auto">
                             {/* Flip back hint */}
-                            <div className="absolute top-4 right-4 z-20 bg-white/20 backdrop-blur-sm rounded-full p-2 pointer-events-none">
+                            <div className="absolute top-4 right-4 z-20 rounded-full p-2 pointer-events-none backdrop-blur-sm" style={{ backgroundColor: "rgba(232, 185, 96, 0.2)" }}>
                                 <svg
-                                    className="w-5 h-5 text-gray-700 dark:text-white"
+                                    className="w-5 h-5"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
+                                    style={{ color: "hsl(45 90% 55%)" }}
                                 >
                                     <path
                                         strokeLinecap="round"
@@ -175,10 +176,10 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
 
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                                    <h3 className="text-2xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
                                         About {displayName}
                                     </h3>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    <p className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
                                         {calculateAge(user.birthdate)} years old
                                     </p>
                                 </div>
@@ -187,12 +188,12 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
                                 <div className="space-y-4">
                                     {user.occupation && (
                                         <div className="flex items-start space-x-3">
-                                            <div className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                                                 <span className="text-lg">💼</span>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">Occupation</p>
-                                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>Occupation</p>
+                                                <p className="text-sm font-medium" style={{ color: "hsl(220 10% 95%)" }}>
                                                     {user.occupation}
                                                 </p>
                                             </div>
@@ -201,12 +202,12 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
 
                                     {user.education && (
                                         <div className="flex items-start space-x-3">
-                                            <div className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                                                 <span className="text-lg">🎓</span>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">Education</p>
-                                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>Education</p>
+                                                <p className="text-sm font-medium" style={{ color: "hsl(220 10% 95%)" }}>
                                                     {user.education}
                                                 </p>
                                             </div>
@@ -215,12 +216,12 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
 
                                     {user.height_cm && (
                                         <div className="flex items-start space-x-3">
-                                            <div className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                                                 <span className="text-lg">📏</span>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">Height</p>
-                                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>Height</p>
+                                                <p className="text-sm font-medium" style={{ color: "hsl(220 10% 95%)" }}>
                                                     {user.height_cm} cm ({Math.round(user.height_cm / 2.54)} inches)
                                                 </p>
                                             </div>
@@ -229,12 +230,12 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
 
                                     {user.relationship_goal && (
                                         <div className="flex items-start space-x-3">
-                                            <div className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                                                 <span className="text-lg">💕</span>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">Looking for</p>
-                                                <p className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                                                <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>Looking for</p>
+                                                <p className="text-sm font-medium capitalize" style={{ color: "hsl(220 10% 95%)" }}>
                                                     {user.relationship_goal.replace(/_/g, " ")}
                                                 </p>
                                             </div>
@@ -243,19 +244,19 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
 
                                     {(user.smoking !== null || user.drinking !== null) && (
                                         <div className="flex items-start space-x-3">
-                                            <div className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                                                 <span className="text-lg">🍷</span>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">Lifestyle</p>
+                                                <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>Lifestyle</p>
                                                 <div className="space-y-1">
                                                     {user.smoking !== null && (
-                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        <p className="text-sm font-medium" style={{ color: "hsl(220 10% 95%)" }}>
                                                             Smoking: {user.smoking ? "Yes" : "No"}
                                                         </p>
                                                     )}
                                                     {user.drinking !== null && (
-                                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        <p className="text-sm font-medium" style={{ color: "hsl(220 10% 95%)" }}>
                                                             Drinking: {user.drinking ? "Yes" : "No"}
                                                         </p>
                                                     )}
@@ -266,12 +267,12 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
 
                                     {user.children && (
                                         <div className="flex items-start space-x-3">
-                                            <div className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
                                                 <span className="text-lg">👶</span>
                                             </div>
                                             <div>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">Children</p>
-                                                <p className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                                                <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>Children</p>
+                                                <p className="text-sm font-medium capitalize" style={{ color: "hsl(220 10% 95%)" }}>
                                                     {user.children}
                                                 </p>
                                             </div>
@@ -279,8 +280,8 @@ export default function MatchCard({ user, onLike, onPass }: MatchCardProps) {
                                     )}
                                 </div>
 
-                                <div className="pt-4 border-t border-gray-300 dark:border-gray-700">
-                                    <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+                                <div className="pt-4 border-t" style={{ borderColor: "rgba(232, 185, 96, 0.2)" }}>
+                                    <p className="text-xs text-center" style={{ color: "hsl(220 10% 60%)" }}>
                                         Tap anywhere to return
                                     </p>
                                 </div>

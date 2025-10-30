@@ -108,10 +108,10 @@ export default function VideoCall({
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-lg">
+      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.9)" }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 mx-auto mb-4" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
+          <p className="text-lg" style={{ color: "hsl(220 10% 95%)" }}>
             {isIncoming ? "Joining call..." : "Starting call..."}
           </p>
         </div>
@@ -121,16 +121,21 @@ export default function VideoCall({
 
   if (error) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div className="text-center text-white max-w-md mx-auto p-8">
-          <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.9)" }}>
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
             <span className="text-2xl">❌</span>
           </div>
-          <h3 className="text-xl font-semibold mb-2">Call Error</h3>
-          <p className="text-gray-300 mb-4">{error}</p>
+          <h3 className="text-xl font-semibold mb-2" style={{ color: "hsl(45 90% 55%)" }}>Call Error</h3>
+          <p className="mb-4" style={{ color: "hsl(220 10% 65%)" }}>{error}</p>
           <button
             onClick={onCallEnd}
-            className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
+            className="font-semibold py-3 px-6 rounded-full transition-all duration-200"
+            style={{
+              background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
+              color: "hsl(220 30% 8%)",
+              boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+            }}
           >
             Close
           </button>
@@ -141,10 +146,10 @@ export default function VideoCall({
 
   if (!client || !call) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-lg">Setting up call...</p>
+      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: "rgba(0, 0, 0, 0.9)" }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 mx-auto mb-4" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
+          <p className="text-lg" style={{ color: "hsl(220 10% 95%)" }}>Setting up call...</p>
         </div>
       </div>
     );

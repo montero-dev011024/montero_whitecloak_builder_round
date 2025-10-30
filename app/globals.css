@@ -1,53 +1,90 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  
-  /* Twilight Enchantment Palette */
-  --primary: #583C5C;
-  --secondary: #E8B960;
-  --accent: #B4A6C2;
-  --bg-light: #F7F4F3;
-  --text-dark: #3D3538;
-}
+  /* Cosmic color palette inspired by the Marahuyo logo */
+  --background: 220 30% 8%;
+  --foreground: 45 100% 95%;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: #583C5C;
-  --color-secondary: #E8B960;
-  --color-accent: #B4A6C2;
-  --color-bg-light: #F7F4F3;
-  --color-text-dark: #3D3538;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --card: 220 28% 12%;
+  --card-foreground: 45 100% 95%;
+
+  --popover: 220 28% 12%;
+  --popover-foreground: 45 100% 95%;
+
+  /* Warm golden primary from logo */
+  --primary: 45 90% 55%;
+  --primary-foreground: 220 30% 8%;
+
+  /* Cool ethereal secondary */
+  --secondary: 200 60% 50%;
+  --secondary-foreground: 220 30% 8%;
+
+  --muted: 220 20% 20%;
+  --muted-foreground: 220 10% 65%;
+
+  /* Purple accent from logo */
+  --accent: 270 60% 60%;
+  --accent-foreground: 45 100% 95%;
+
+  /* Pink heart accent */
+  --romantic: 340 80% 65%;
+  --romantic-foreground: 220 30% 8%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 45 100% 95%;
+
+  --border: 220 20% 20%;
+  --input: 220 20% 20%;
+  --ring: 45 90% 55%;
+
+  --radius: 0.75rem;
+
+  /* Gradient definitions */
+  --gradient-cosmic: linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%));
+  --gradient-warm: linear-gradient(135deg, hsl(25 85% 55%), hsl(45 90% 55%));
+  --gradient-cool: linear-gradient(135deg, hsl(200 60% 50%), hsl(270 60% 60%));
+  --gradient-hero: linear-gradient(180deg, hsl(220 30% 8% / 0.95), hsl(270 40% 15% / 0.98));
+
+  /* Shadow effects */
+  --shadow-glow-warm: 0 0 40px hsl(45 90% 55% / 0.3);
+  --shadow-glow-cool: 0 0 40px hsl(200 60% 50% / 0.3);
+  --shadow-glow-accent: 0 0 30px hsl(270 60% 60% / 0.4);
+
+  /* Animations */
+  --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 220 30% 8%;
+    --foreground: 45 100% 95%;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 @layer components {
   .card-swipe {
-    @apply relative overflow-hidden rounded-2xl shadow-lg bg-white dark:bg-gray-800;
+    @apply relative overflow-hidden rounded-2xl shadow-lg;
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
   }
 
   .match-button {
-    @apply bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-200;
+    @apply text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-200;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    color: hsl(var(--primary-foreground));
   }
 
   .chat-container {
-    @apply bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
+    @apply rounded-lg shadow-sm border;
+    background-color: hsl(var(--card));
+    border-color: hsl(var(--border));
   }
 
   /* 3D flip card styles */
