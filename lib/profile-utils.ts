@@ -1,5 +1,42 @@
+/**
+ * Profile Data Mapping Utilities
+ * 
+ * Utility functions and types for transforming raw database query results
+ * into properly typed UserProfile objects. Handles data normalization,
+ * type validation, and default value assignment.
+ * 
+ * Key Features:
+ * - Type-safe database query select strings
+ * - Data normalization (booleans, decimals, nested objects)
+ * - Default preference handling
+ * - Gender and relationship goal validation
+ * - Profile details extraction from joins
+ * 
+ * Usage:
+ * - Use `userWithProfileSelect` in Supabase queries for consistent data fetching
+ * - Call `mapUserRowToProfile()` to convert raw query results to UserProfile
+ * - Ensures all required fields have valid values
+ * 
+ * @module lib/profile-utils
+ * @example
+ * ```typescript
+ * import { userWithProfileSelect, mapUserRowToProfile } from "@/lib/profile-utils";
+ * 
+ * const { data } = await supabase
+ *   .from("users")
+ *   .select(userWithProfileSelect)
+ *   .eq("id", userId)
+ *   .single();
+ * 
+ * const profile = mapUserRowToProfile(data);
+ * ```
+ */
+
 import type { UserPreferences, UserProfile } from "@/app/profile/page";
 
+/**
+ * Raw user row data structure from database query
+ */
 type UserRow = {
     id: string;
     full_name: string;

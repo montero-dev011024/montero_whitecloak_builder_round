@@ -1,5 +1,32 @@
     "use client";
 
+/**
+ * MatchCard Component
+ * 
+ * Interactive card displaying a potential match's profile with flip functionality.
+ * Front side shows profile picture with basic info, back side shows detailed information.
+ * Integrated with SwipeableCard for swipe-to-like/pass functionality.
+ * 
+ * Key Features:
+ * - Flip animation to reveal detailed profile information
+ * - Swipeable left (pass) and right (like) interactions
+ * - Front: Profile photo, name, age, and bio
+ * - Back: Comprehensive profile details (occupation, education, height, preferences, lifestyle)
+ * - Touch and mouse support for flipping and swiping
+ * - Prevents flip during swipe gestures
+ * - Cosmic theme styling with glass-morphism effects
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <MatchCard 
+ *   user={potentialMatch}
+ *   onLike={() => handleLike(potentialMatch.id)}
+ *   onPass={() => handlePass(potentialMatch.id)}
+ * />
+ * ```
+ */
+
 import { UserProfile } from "@/app/profile/page";
 import { calculateAge } from "@/lib/helpers/calculate-age";
 import Image from "next/image";
@@ -9,8 +36,11 @@ import { useState } from "react";
 const DEFAULT_AVATAR = "/default-avatar.svg";
 
 interface MatchCardProps {
+    /** User profile object to display */
     user: UserProfile;
+    /** Callback when user swipes right or likes */
     onLike?: () => void;
+    /** Callback when user swipes left or passes */
     onPass?: () => void;
 }
 

@@ -1,5 +1,41 @@
 "use client";
 
+/**
+ * Navbar Component
+ * 
+ * Global navigation bar for the Marahuyo dating app.
+ * Provides main navigation links, user profile dropdown, and authentication actions.
+ * Automatically hidden on landing page and authentication page.
+ * 
+ * Key Features:
+ * - Conditional rendering (hidden on auth and home pages)
+ * - User profile picture and full name display
+ * - Desktop and mobile responsive layouts
+ * - Dropdown menu with profile options
+ * - Navigation links: Discover, Matches, Messages
+ * - User actions: View Profile, Blocked Users, Sign Out
+ * - Real-time profile data loading from Supabase
+ * - Sticky positioning at top of viewport
+ * - Cosmic theme with glass-morphism backdrop
+ * - Smooth hover animations and transitions
+ * 
+ * Navigation Structure:
+ * - Desktop: Horizontal nav links with dropdown
+ * - Mobile: Hamburger menu with full navigation
+ * - Authenticated: Full navigation with profile
+ * - Unauthenticated: Sign In button only
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * // In app/layout.tsx
+ * <AuthProvider>
+ *   <Navbar />
+ *   {children}
+ * </AuthProvider>
+ * ```
+ */
+
 import { useAuth } from "@/contexts/auth-contexts";
 import Link from "next/link";
 import { useState, useEffect } from "react";

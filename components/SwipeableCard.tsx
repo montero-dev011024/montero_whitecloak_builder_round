@@ -1,16 +1,57 @@
 "use client";
 
+/**
+ * SwipeableCard Component
+ * 
+ * Reusable wrapper that adds Tinder-style swipe functionality to any child content.
+ * Supports both mouse and touch interactions with smooth animations and visual feedback.
+ * Shows "LIKE" or "NOPE" overlays based on swipe direction.
+ * 
+ * Key Features:
+ * - Horizontal swipe detection (left/right)
+ * - Configurable swipe threshold before triggering action
+ * - Rotation animation based on swipe distance
+ * - Opacity fade as card is swiped away
+ * - Mouse and touch event support
+ * - Customizable overlays for left/right swipes
+ * - Default "LIKE" (green) and "NOPE" (red) overlays
+ * - Smooth spring-back animation if swipe threshold not met
+ * - Visual hint label when not swiping
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <SwipeableCard
+ *   onSwipeRight={() => likeUser(userId)}
+ *   onSwipeLeft={() => passUser(userId)}
+ *   threshold={120}
+ *   rotationFactor={0.15}
+ * >
+ *   <UserProfileCard user={currentUser} />
+ * </SwipeableCard>
+ * ```
+ */
+
 import { useState, useRef, useEffect, ReactNode } from "react";
 
 interface SwipeableCardProps {
+    /** Callback when swiped left (pass/reject) */
     onSwipeLeft?: () => void;
+    /** Callback when swiped right (like/accept) */
     onSwipeRight?: () => void;
+    /** Content to be wrapped in swipeable container */
     children: ReactNode;
+    /** Distance in pixels required to trigger swipe action (default: 100) */
     threshold?: number;
+    /** Multiplier for rotation based on swipe distance (default: 0.1) */
     rotationFactor?: number;
+    /** Whether to show default LIKE/NOPE overlays (default: true) */
     showOverlays?: boolean;
+    /** Custom overlay to show when swiping left */
     leftOverlay?: ReactNode;
+    /** Custom overlay to show when swiping right */
     rightOverlay?: ReactNode;
+    /** Additional CSS classes for the card container */
     className?: string;
 }
 

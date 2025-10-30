@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-contexts";
 import Navbar from "@/components/Navbar";
 import MessageNotificationListener from "@/components/MessageNotificationListener";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,13 +31,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <div className="min-h-screen font-sans">
-            <Navbar />
-            <MessageNotificationListener />
-            {children}
-          </div>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <div className="min-h-screen font-sans">
+              <Navbar />
+              <MessageNotificationListener />
+              {children}
+            </div>
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

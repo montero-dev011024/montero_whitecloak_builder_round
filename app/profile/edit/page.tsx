@@ -1,5 +1,73 @@
 "use client";
 
+/**
+ * Profile Edit Page
+ * 
+ * Comprehensive profile editing interface allowing users to update all aspects
+ * of their profile including basic info, profile details, and profile picture.
+ * Features form validation, loading states, and success/error feedback.
+ * 
+ * Key Features:
+ * - Edit basic profile information (name, bio, gender, birthdate)
+ * - Edit profile details (height, education, occupation, lifestyle)
+ * - Profile picture upload with live preview
+ * - Relationship goal selection
+ * - Lifestyle choices (smoking, drinking, children)
+ * - Form validation before submission
+ * - Loading states during save operations
+ * - Success/error feedback messages
+ * - Cancel button to discard changes
+ * - Responsive form layout
+ * - Icon-based visual indicators
+ * 
+ * Editable Fields:
+ * 
+ * Basic Information:
+ * - Full Name: Display name
+ * - Bio: Profile description (textarea)
+ * - Gender: Male, Female, Non-binary, Prefer not to say
+ * - Birthdate: Date picker
+ * - Profile Picture: Image upload with preview
+ * 
+ * Profile Details:
+ * - Height: Centimeters (number input)
+ * - Education: School/degree (text input)
+ * - Occupation: Job title/profession (text input)
+ * - Relationship Goal: Casual, Serious, Not sure, Exploring
+ * - Smoking: Yes/No/Not set
+ * - Drinking: Yes/No/Not set
+ * - Children: Have/Want/Don't want/Open/Not set
+ * 
+ * Form Handling:
+ * - Loads current profile data on mount
+ * - Tracks changes with controlled inputs
+ * - Validates data before submission
+ * - Splits updates between users and profiles tables
+ * - Redirects to profile view on successful save
+ * - Displays error messages on failure
+ * 
+ * Photo Upload:
+ * - PhotoUpload component integration
+ * - Live preview of uploaded image
+ * - Fallback to default avatar
+ * - Updates both state and database
+ * 
+ * Visual Design:
+ * - Cosmic theme with gradient background
+ * - Glass-morphism form containers
+ * - Two-column responsive layout
+ * - Golden accent colors for labels
+ * - Icon-based field indicators
+ * - Smooth transitions and hover effects
+ * 
+ * Navigation:
+ * - Cancel: Returns to profile view without saving
+ * - Save: Updates profile and navigates to profile view
+ * 
+ * @page
+ * @route /profile/edit
+ */
+
 import PhotoUpload from "@/components/PhotoUpload";
 import type { UserProfile } from "@/app/profile/page";
 import {
@@ -16,11 +84,17 @@ export default function EditProfilePage() {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
+/**
+ * Form state type for basic profile fields
+ */
 type EditableProfileFormState = Pick<
 UserProfile,
 "full_name" | "bio" | "gender" | "birthdate" | "profile_picture_url"
 >;
 
+/**
+ * Form state type for extended profile details
+ */
 interface ProfileDetailsFormState {
 height_cm: number | null;
 education: string;

@@ -1,5 +1,45 @@
 "use client";
 
+/**
+ * Individual Chat Conversation Page
+ * 
+ * Full-screen chat interface for one-on-one conversations between matched users.
+ * Integrates ChatHeader for user info/actions and StreamChatInterface for messaging.
+ * Validates that users are actually matched before allowing access.
+ * 
+ * Key Features:
+ * - Real-time messaging via Stream Chat SDK
+ * - Video call initiation from header button
+ * - Chat header with user profile info and online status
+ * - Message history and typing indicators
+ * - Validation that users are matched
+ * - Redirect to /chat if match doesn't exist
+ * - Loading states during initialization
+ * - Error handling for invalid access
+ * - Ref forwarding for video call control
+ * 
+ * URL Parameters:
+ * - userId: ID of the matched user to chat with
+ * 
+ * Security:
+ * - Verifies match relationship before loading chat
+ * - Redirects unauthorized access to chat list
+ * - Uses authenticated user context
+ * 
+ * Components:
+ * - ChatHeader: User info, back button, video call button
+ * - StreamChatInterface: Message list, input, video call modal
+ * 
+ * Visual Design:
+ * - Full-screen layout with cosmic background
+ * - Fixed header with chat content below
+ * - Centered container (max-width: 4xl)
+ * - Flexible height management
+ * 
+ * @page
+ * @route /chat/[userId]
+ */
+
 import { UserProfile } from "@/app/profile/page";
 import ChatHeader from "@/components/ChatHeader";
 import StreamChatInterface from "@/components/StreamChatInterface";

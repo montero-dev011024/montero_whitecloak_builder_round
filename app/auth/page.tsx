@@ -1,5 +1,39 @@
 'use client';
 
+/**
+ * Authentication Page
+ * 
+ * Unified sign in/sign up page with toggle between modes.
+ * Features cosmic-themed design matching the landing page aesthetic.
+ * Automatically redirects authenticated users to the discover page.
+ * 
+ * Key Features:
+ * - Toggle between sign in and sign up modes
+ * - Email and password authentication via Supabase
+ * - Client-side form validation
+ * - Loading states during authentication
+ * - Error message display with cosmic styling
+ * - Email verification handling for new signups
+ * - Animated starfield background
+ * - "Back to Home" navigation link
+ * - Auto-redirect for authenticated users
+ * 
+ * Authentication Flow:
+ * - Sign Up: Creates new user account and sends verification email
+ * - Sign In: Validates credentials and creates session
+ * - Redirects to /discover on successful authentication
+ * 
+ * Visual Design:
+ * - Cosmic gradient background with animated stars
+ * - Glass-morphism card for form container
+ * - Golden accent colors for branding
+ * - Responsive layout (mobile to desktop)
+ * - Animated logo with glow effect
+ * 
+ * @page
+ * @route /auth
+ */
+
 import { useAuth } from "@/contexts/auth-contexts";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -7,6 +41,9 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+/**
+ * Individual star configuration for animated background
+ */
 interface Star {
   left: number;
   top: number;

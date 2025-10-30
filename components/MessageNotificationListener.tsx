@@ -1,5 +1,40 @@
 "use client";
 
+/**
+ * MessageNotificationListener Component
+ * 
+ * Global listener for real-time message notifications from Stream Chat.
+ * Monitors all active chat channels and displays toast notifications for new messages.
+ * Only shows notifications when user is not viewing the specific chat.
+ * 
+ * Key Features:
+ * - Real-time message detection across all channels
+ * - Automatic Stream Chat client initialization
+ * - Dynamic channel watching (including newly created channels)
+ * - Smart notification filtering (no notifications for own messages, video calls, or active chats)
+ * - Profile picture caching to reduce database queries
+ * - Handles user authentication state changes
+ * - Proper cleanup on unmount to prevent memory leaks
+ * - Context-aware notifications (suppressed on chat pages)
+ * 
+ * Integration:
+ * - Should be placed in the root layout to monitor globally
+ * - Requires authenticated user from AuthContext
+ * - Connects to Stream Chat and Supabase
+ * - Automatically reconnects on user change
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * // In app/layout.tsx
+ * <AuthProvider>
+ *   <Navbar />
+ *   <MessageNotificationListener />
+ *   {children}
+ * </AuthProvider>
+ * ```
+ */
+
 import { useAuth } from "@/contexts/auth-contexts";
 import MessageNotification from "@/components/MessageNotification";
 import { getStreamUserToken } from "@/lib/actions/stream";
@@ -9,10 +44,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Channel, Event, StreamChat } from "stream-chat";
 
 interface NotificationState {
+    /** ID of the user who sent the message */
     senderId: string;
+    /** Display name of the sender */
     senderName: string;
+    /** URL of sender's profile picture */
     senderAvatar?: string | null;
+    /** Preview text of the message */
     messagePreview: string;
+    /** ISO timestamp when message was sent */
     sentAt?: string;
 }
 

@@ -1,10 +1,40 @@
 "use client";
 
+/**
+ * Home/Landing Page
+ * 
+ * Main landing page for the Marahuyo dating app featuring a cosmic-themed
+ * hero section with animated stars, branding, and call-to-action buttons.
+ * Hidden when user navigates to other pages (Navbar handles visibility).
+ * 
+ * Key Features:
+ * - Animated starfield background (50 stars with pulse animations)
+ * - Client-side star generation to avoid hydration mismatches
+ * - Responsive hero layout with logo and headlines
+ * - Primary CTA button leading to authentication page
+ * - Statistics section showing app metrics
+ * - Cosmic theme with gradient backgrounds and golden accents
+ * - Fully responsive design (mobile to desktop)
+ * 
+ * Visual Elements:
+ * - Animated Marahuyo logo with glow effect
+ * - Hero headline and subheadline
+ * - "Start Your Journey" button with heart icon
+ * - Stats grid (Users, Matches, Success Rate)
+ * - Bottom gradient fade effect
+ * 
+ * @page
+ * @route /
+ */
+
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/contexts/auth-contexts";
 import { useState, useEffect } from "react";
 
+/**
+ * Individual star configuration for animated background
+ */
 interface Star {
   left: number;
   top: number;

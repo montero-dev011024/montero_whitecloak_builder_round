@@ -1,11 +1,54 @@
 "use client";
 
+/**
+ * Chat List Page
+ * 
+ * Displays a list of all active conversations with matched users.
+ * Shows preview of last message, timestamp, and unread count for each chat.
+ * Serves as the main messaging inbox for the Marahuyo dating app.
+ * 
+ * Key Features:
+ * - List of all active conversations sorted by recent activity
+ * - Last message preview for each conversation
+ * - Timestamp formatting (relative time: "5:30 PM", "Yesterday", "12/25")
+ * - Profile pictures with unread count badges
+ * - Empty state with CTA to start swiping
+ * - Loading states during data fetch
+ * - Click to navigate to individual chat
+ * - Real-time message synchronization via Stream Chat
+ * - Philippine timezone formatting for timestamps
+ * 
+ * Data Loading:
+ * - Fetches all matched users from database
+ * - Queries last message from each Stream Chat channel
+ * - Falls back to "Start your conversation!" for new matches
+ * - Uses match creation time if no messages exist
+ * 
+ * Time Formatting:
+ * - Last 24 hours: Shows time (e.g., "5:30 PM")
+ * - Yesterday: Shows "Yesterday"
+ * - Older: Shows full date (e.g., "12/25/2024")
+ * 
+ * Visual Design:
+ * - Cosmic theme with gradient background
+ * - Glass-morphism container for chat list
+ * - Golden accents for user names
+ * - Hover effects on chat items
+ * - Responsive layout
+ * 
+ * @page
+ * @route /chat
+ */
+
 import { getUserMatches } from "@/lib/actions/matches";
 import { getLastMessage } from "@/lib/actions/stream";
 import { useEffect, useState } from "react";
 import { UserProfile } from "../profile/page";
 import Link from "next/link";
 
+/**
+ * Individual chat data structure for list display
+ */
 interface ChatData {
   id: string;
   user: UserProfile;

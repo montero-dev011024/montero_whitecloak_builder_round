@@ -1,5 +1,46 @@
 "use client";
 
+/**
+ * Blocked Users Management Page
+ * 
+ * Displays a list of all users blocked by the current user and provides
+ * functionality to unblock them. Shows detailed information about each
+ * blocked user including when and optionally why they were blocked.
+ * 
+ * Key Features:
+ * - List of all blocked users with profile information
+ * - Unblock functionality with confirmation dialog
+ * - Display block date and reason (if provided)
+ * - User profile pictures and basic details
+ * - Empty state when no users are blocked
+ * - Loading states during data fetch
+ * - Success/error feedback messages
+ * - Back navigation button
+ * - Responsive card layout
+ * 
+ * User Actions:
+ * - View all blocked users
+ * - Unblock users (with confirmation)
+ * - Navigate back to previous page
+ * 
+ * Data Displayed:
+ * - Profile picture
+ * - Full name and age
+ * - Occupation (if available)
+ * - Block date (formatted)
+ * - Block reason (if provided)
+ * 
+ * Visual Design:
+ * - Cosmic theme with gradient background
+ * - Glass-morphism cards for each blocked user
+ * - Golden accent colors
+ * - Icon-based visual indicators
+ * - Responsive grid layout
+ * 
+ * @page
+ * @route /block
+ */
+
 import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";

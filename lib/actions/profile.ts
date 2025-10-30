@@ -1,8 +1,35 @@
 "use server";
 
+/**
+ * Profile Management Actions
+ * 
+ * Server-side functions for managing user profiles and preferences.
+ * Handles profile data retrieval, updates, photo uploads, and user preferences
+ * including discovery preferences (age range, distance, gender, relationship goals).
+ * 
+ * Key Features:
+ * - Profile data fetching and updating
+ * - Photo upload to Supabase Storage
+ * - User preferences management (discovery settings)
+ * - Gender preference add/remove operations
+ * - Profile details management (height, education, occupation, etc.)
+ * - User interests management
+ * - Preference normalization and validation
+ * 
+ * Database Tables:
+ * - users: Core user data (name, bio, birthdate, preferences)
+ * - profiles: Extended profile data (photo, physical attributes, lifestyle)
+ * - user_interests: User's selected interests
+ * 
+ * @module lib/actions/profile
+ */
+
 import type { UserPreferences, UserProfile } from "@/app/profile/page";
 import { createClient } from "../supabase/server";
 
+/**
+ * Default user preferences applied to new users or when preferences are missing
+ */
 const DEFAULT_USER_PREFERENCES: UserPreferences = {
     age_range: {
         min: 18,
@@ -13,6 +40,14 @@ const DEFAULT_USER_PREFERENCES: UserPreferences = {
     relationship_goal: "not_sure",
 };
 
+/**
+ * Normalizes and validates raw preference data from the database
+ * Ensures all fields have valid values and proper types
+ * 
+ * @param raw - Raw preference data from database (possibly malformed)
+ * @returns Validated and normalized UserPreferences object
+ * @private
+ */
 const normalizePreferences = (raw: unknown): UserPreferences => {
     if (!raw || typeof raw !== "object") {
         return structuredClone(DEFAULT_USER_PREFERENCES);
@@ -63,6 +98,16 @@ const normalizePreferences = (raw: unknown): UserPreferences => {
     };
 };
 
+/**
+ * Merges partial preference updates with current preferences
+ * Ensures age range min/max are correctly ordered
+ * Deduplicates gender preferences array
+ * 
+ * @param current - Current user preferences
+ * @param updates - Partial updates to apply
+ * @returns Merged preferences object
+ * @private
+ */
 const mergePreferences = (
     current: UserPreferences,
     updates: Partial<UserPreferences>,
@@ -88,6 +133,12 @@ const mergePreferences = (
     return merged;
 };
 
+/**
+ * Gets the authenticated user's ID from Supabase session
+ * 
+ * @returns Object with Supabase client and user ID (or null if not authenticated)
+ * @private
+ */
 async function getAuthenticatedUserId() {
     const supabase = await createClient();
     const {
@@ -101,6 +152,27 @@ async function getAuthenticatedUserId() {
     return { supabase, userId: user.id } as const;
 }
 
+/**
+ * Fetches the complete profile of the currently authenticated user
+ * Combines data from users table and profiles table
+ * 
+ * Data Retrieved:
+ * - Basic info: name, email, gender, birthdate, bio
+ * - Preferences: age range, distance, gender preferences, relationship goal
+ * - Profile details: photo, height, education, occupation, lifestyle choices
+ * - Metadata: online status, verification status, timestamps
+ * 
+ * @returns Complete user profile or null if not authenticated
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const profile = await getCurrentUserProfile();
+ * if (profile) {
+ *   console.log(`${profile.full_name}, ${calculateAge(profile.birthdate)}`);
+ * }
+ * ```
+ */
 export async function getCurrentUserProfile() {
     const supabase = await createClient();
 
@@ -174,6 +246,31 @@ export async function getCurrentUserProfile() {
     return combinedProfile as UserProfile;
 }
 
+/**
+ * Updates the user's basic profile information in the users table
+ * 
+ * Updatable Fields:
+ * - full_name: Display name
+ * - bio: Profile description
+ * - gender: User's gender identity
+ * - birthdate: Date of birth
+ * - location_lat/lng: Geographic coordinates
+ * - preferences: Discovery preferences object
+ * 
+ * @param profileData - Partial profile data to update
+ * @returns Success status or error message
+ * 
+ * @example
+ * ```typescript
+ * const result = await updateUserProfile({
+ *   full_name: "Jane Doe",
+ *   bio: "Coffee enthusiast and adventure seeker"
+ * });
+ * if (result.success) {
+ *   console.log("Profile updated!");
+ * }
+ * ```
+ */
 export async function updateUserProfile(profileData: Partial<UserProfile>) {
     const supabase = await createClient();
 
@@ -213,6 +310,32 @@ export async function updateUserProfile(profileData: Partial<UserProfile>) {
     return { success: true };
 }
 
+/**
+ * Uploads a profile picture to Supabase Storage and updates the database
+ * 
+ * Process:
+ * 1. Validates user authentication
+ * 2. Uploads file to 'profile-photos' bucket
+ * 3. Gets public URL for the uploaded file
+ * 4. Updates profiles table with new URL and timestamp
+ * 
+ * File Naming:
+ * - Format: {userId}/{userId}-{timestamp}.{extension}
+ * - Prevents overwriting (upsert: false)
+ * - Cache control: 3600 seconds
+ * 
+ * @param file - Image file to upload (validated on client side)
+ * @returns Success status with public URL or error message
+ * 
+ * @example
+ * ```typescript
+ * const file = event.target.files[0];
+ * const result = await uploadProfilePhoto(file);
+ * if (result.success) {
+ *   setProfilePicture(result.url);
+ * }
+ * ```
+ */
 export async function uploadProfilePhoto(file: File) {
     const supabase = await createClient();
 
@@ -267,6 +390,31 @@ export async function uploadProfilePhoto(file: File) {
     return { success: true, url: publicUrl };
 }
 
+/**
+ * Updates extended profile details in the profiles table
+ * 
+ * Updatable Fields:
+ * - height_cm: Height in centimeters
+ * - education: Education level/institution
+ * - occupation: Job title/profession
+ * - relationship_goal: What user is looking for
+ * - smoking: Whether user smokes
+ * - drinking: Whether user drinks
+ * - children: Children status/plans
+ * 
+ * @param profileData - Profile details to update
+ * @returns Success status or error message
+ * 
+ * @example
+ * ```typescript
+ * const result = await updateProfileDetails({
+ *   height_cm: 175,
+ *   occupation: "Software Engineer",
+ *   smoking: false,
+ *   drinking: true
+ * });
+ * ```
+ */
 export async function updateProfileDetails(profileData: {
     height_cm?: number;
     education?: string;
@@ -302,6 +450,30 @@ export async function updateProfileDetails(profileData: {
     return { success: true };
 }
 
+/**
+ * Updates user's discovery preferences (who they want to see in matches)
+ * Merges partial updates with existing preferences
+ * 
+ * Preference Fields:
+ * - age_range: { min, max } - Age range for matches
+ * - distance_miles: Maximum distance for matches
+ * - gender_preferences: Array of preferred genders
+ * - relationship_goal: What user is looking for
+ * 
+ * @param preferencesUpdate - Partial preferences to update
+ * @returns Success status with merged preferences or error
+ * 
+ * @example
+ * ```typescript
+ * const result = await updateUserPreferences({
+ *   age_range: { min: 25, max: 35 },
+ *   distance_miles: 50
+ * });
+ * if (result.success) {
+ *   console.log("Preferences updated:", result.preferences);
+ * }
+ * ```
+ */
 export async function updateUserPreferences(
     preferencesUpdate: Partial<UserPreferences>,
 ) {
@@ -343,6 +515,18 @@ export async function updateUserPreferences(
 
 type GenderPreference = UserPreferences["gender_preferences"][number];
 
+/**
+ * Adds a gender to the user's gender preferences
+ * Automatically deduplicates if gender already exists
+ * 
+ * @param gender - Gender to add to preferences
+ * @returns Success status with updated preferences or error
+ * 
+ * @example
+ * ```typescript
+ * await addGenderPreference("female");
+ * ```
+ */
 export async function addGenderPreference(gender: GenderPreference) {
     if (!gender || typeof gender !== "string") {
         return { success: false, error: "Invalid gender preference" };
@@ -371,6 +555,17 @@ export async function addGenderPreference(gender: GenderPreference) {
     return updateUserPreferences({ gender_preferences: updated });
 }
 
+/**
+ * Removes a gender from the user's gender preferences
+ * 
+ * @param gender - Gender to remove from preferences
+ * @returns Success status with updated preferences or error
+ * 
+ * @example
+ * ```typescript
+ * await removeGenderPreference("male");
+ * ```
+ */
 export async function removeGenderPreference(gender: GenderPreference) {
     if (!gender || typeof gender !== "string") {
         return { success: false, error: "Invalid gender preference" };
@@ -399,6 +594,18 @@ export async function removeGenderPreference(gender: GenderPreference) {
     return updateUserPreferences({ gender_preferences: filtered });
 }
 
+/**
+ * Adds multiple interests to the user's profile
+ * Interests are used for matching and profile display
+ * 
+ * @param interestIds - Array of interest IDs to add
+ * @returns Success status or error message
+ * 
+ * @example
+ * ```typescript
+ * await addUserInterests([1, 5, 12, 23]);
+ * ```
+ */
         export async function addUserInterests(interestIds: number[]) {
     const supabase = await createClient();
 
@@ -422,6 +629,17 @@ export async function removeGenderPreference(gender: GenderPreference) {
     return { success: true };
     }
 
+/**
+ * Removes a specific interest from the user's profile
+ * 
+ * @param interestId - ID of the interest to remove
+ * @returns Success status or error message
+ * 
+ * @example
+ * ```typescript
+ * await removeUserInterest(5);
+ * ```
+ */
     export async function removeUserInterest(interestId: number) {
     const supabase = await createClient();
 

@@ -1,5 +1,65 @@
 "use client";
 
+/**
+ * Matches List Page
+ * 
+ * Displays a grid of all active matches with options to open chat, unmatch,
+ * or block each user. Features real-time updates via Supabase subscriptions
+ * to automatically reflect new matches and removed matches.
+ * 
+ * Key Features:
+ * - Grid display of all matched users
+ * - Real-time match updates via Supabase realtime subscriptions
+ * - Profile pictures with hover effects
+ * - User info cards (name, age, occupation, bio)
+ * - Action buttons per match (Chat, Unmatch, Block)
+ * - Confirmation dialogs for destructive actions
+ * - Empty state when no matches exist
+ * - Loading and error states
+ * - Responsive grid layout (1-3 columns based on screen size)
+ * - Success/error feedback messages
+ * 
+ * User Actions:
+ * - Open Chat: Navigate to individual chat page
+ * - Unmatch: Remove match relationship (with confirmation)
+ * - Block: Block user and remove match (with confirmation and optional reason)
+ * 
+ * Real-time Features:
+ * - Automatically adds new matches to the list
+ * - Removes matches when unmatched or blocked
+ * - Updates match status on changes
+ * - Subscribes to matches table for current user
+ * 
+ * Block Confirmation:
+ * - Custom modal with reason input
+ * - Optional reason for blocking (free text)
+ * - "Block" and "Cancel" actions
+ * - Removes match and prevents future matching
+ * 
+ * Data Displayed per Match:
+ * - Profile picture (with fallback)
+ * - Full name and age
+ * - Occupation (if available)
+ * - Bio snippet (truncated)
+ * - Online status indicator
+ * 
+ * Visual Design:
+ * - Cosmic theme with gradient background
+ * - Glass-morphism cards for matches
+ * - Golden accents for names and buttons
+ * - Hover effects with scale and shadow
+ * - Icon-based action buttons
+ * - Responsive grid layout
+ * 
+ * Empty State:
+ * - Displays when no matches exist
+ * - Encourages user to start swiping
+ * - Link to discover page
+ * 
+ * @page
+ * @route /discover/list
+ */
+
 import { UserProfile } from "@/app/profile/page";
 import { getUserMatches } from "@/lib/actions/matches";
 import { useCallback, useEffect, useState, useTransition } from "react";
@@ -15,6 +75,9 @@ import { useAuth } from "@/contexts/auth-contexts";
 
 const DEFAULT_AVATAR = "/default-avatar.svg";
 
+/**
+ * Match row data structure from Supabase realtime events
+ */
 type MatchRow = {
     id: string;
     user1_id: string;

@@ -1,5 +1,73 @@
     "use client";
 
+/**
+ * Discover/Swipe Page
+ * 
+ * Main discovery interface for finding potential matches through card swiping.
+ * Features Tinder-style swipeable cards, real-time preference editing, and
+ * match notifications. Filters potential matches based on user preferences.
+ * 
+ * Key Features:
+ * - Swipeable card interface (left to pass, right to like)
+ * - Real-time preference adjustment sidebar
+ * - Match notification with immediate chat option
+ * - Filter potential matches by age, distance, and gender preferences
+ * - Automatic match checking on mutual likes
+ * - Empty state when no matches available
+ * - Loading states during data fetch
+ * - Card stack with current match indicator
+ * - Preference persistence to database
+ * 
+ * Swiping Actions:
+ * - Swipe Right / Like: Creates like in database, checks for mutual match
+ * - Swipe Left / Pass: Skips to next profile without action
+ * - Match Detection: Shows notification if both users have liked each other
+ * 
+ * Discovery Preferences (Editable):
+ * - Age Range: Min and max age filters (18-100)
+ * - Distance: Maximum distance in miles (1-100)
+ * - Gender Preferences: Male, Female, Non-binary (multi-select)
+ * - Relationship Goal: What user is looking for
+ * 
+ * Preference Controls:
+ * - Collapsible sidebar for preference editing
+ * - Real-time validation and feedback
+ * - Save preferences button
+ * - Reset to defaults option
+ * - Icon-based visual indicators
+ * 
+ * Match Notification:
+ * - Displays when mutual match occurs
+ * - Shows matched user's profile picture
+ * - "Start Chat" button for immediate messaging
+ * - "Later" button to dismiss
+ * - Auto-dismisses after 5 seconds
+ * 
+ * Empty States:
+ * - No profiles available message
+ * - Suggestions to adjust preferences
+ * - Link to edit profile
+ * 
+ * Visual Design:
+ * - Cosmic theme with gradient background
+ * - Card-based swipeable interface
+ * - Glass-morphism sidebar
+ * - Golden accents throughout
+ * - Responsive layout (mobile and desktop)
+ * - Smooth animations and transitions
+ * 
+ * Data Flow:
+ * 1. Load user's current preferences
+ * 2. Fetch potential matches based on preferences
+ * 3. Display matches as swipeable cards
+ * 4. Handle like/pass actions
+ * 5. Check for mutual matches
+ * 6. Update preferences in real-time
+ * 
+ * @page
+ * @route /discover
+ */
+
     import { useCallback, useEffect, useState } from "react";
     import { useRouter } from "next/navigation";
     import type { UserPreferences, UserProfile } from "../profile/page";
@@ -11,6 +79,9 @@
     import MatchCard from "@/components/MatchCard";
     import MatchNotification from "@/components/MatchNotification";
 
+    /**
+     * Default discovery preferences applied when user has none set
+     */
     const defaultPreferences: UserPreferences = {
         age_range: { min: 18, max: 50 },
         distance_miles: 25,

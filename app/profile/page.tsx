@@ -1,11 +1,64 @@
 "use client";
 
+/**
+ * User Profile View Page
+ * 
+ * Displays the current user's complete profile including personal information,
+ * profile details, and discovery preferences. Provides navigation to edit profile
+ * and manage blocked users. Read-only view of all profile data.
+ * 
+ * Key Features:
+ * - Display complete user profile information
+ * - Profile picture with fallback to default avatar
+ * - Basic info (name, age, email, bio)
+ * - Additional details (occupation, education, height, lifestyle)
+ * - Discovery preferences display
+ * - Quick action links (Edit Profile, Blocked Users, Settings)
+ * - Loading and error states
+ * - Responsive card-based layout
+ * - Icons for visual clarity
+ * 
+ * Data Displayed:
+ * - Profile picture with camera icon for upload
+ * - Full name and age calculated from birthdate
+ * - Email address
+ * - Bio/description
+ * - Occupation and education
+ * - Height in centimeters
+ * - Relationship goal
+ * - Lifestyle choices (smoking, drinking, children)
+ * - Discovery preferences (age range, distance, genders)
+ * 
+ * Quick Actions:
+ * - Edit Profile: Navigate to /profile/edit
+ * - Blocked Users: Navigate to /block
+ * - Settings: Placeholder for future feature
+ * 
+ * Visual Design:
+ * - Cosmic theme with gradient background
+ * - Glass-morphism cards for content sections
+ * - Golden accents for headings and icons
+ * - Responsive grid layout
+ * - Icon-based visual indicators
+ * 
+ * Type Definitions:
+ * - Exports UserProfile interface for app-wide use
+ * - Exports UserPreferences interface
+ * - Exports UserProfileDetails interface
+ * 
+ * @page
+ * @route /profile
+ */
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCurrentUserProfile } from "@/lib/actions/profile";
 import { calculateAge } from "@/lib/helpers/calculate-age";
 
-
+/**
+ * Complete user profile data structure
+ * Used throughout the app for type safety
+ */
 export interface UserProfile {
   id: string;
   full_name: string;

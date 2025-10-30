@@ -1,11 +1,49 @@
     "use client";
 
+/**
+ * PhotoUpload Component
+ * 
+ * Profile picture upload button with validation and loading states.
+ * Styled as a floating camera button typically positioned over a profile picture.
+ * Handles file selection, validation, upload, and error display.
+ * 
+ * Key Features:
+ * - File type validation (images only)
+ * - File size validation (max 5MB)
+ * - Loading spinner during upload
+ * - Error state display
+ * - Success callback with uploaded image URL
+ * - Cosmic theme golden button styling
+ * - Hidden file input with programmatic trigger
+ * - Disabled state during upload
+ * 
+ * Validation Rules:
+ * - Only image files accepted (image/*)
+ * - Maximum file size: 5MB
+ * - Server-side upload to Supabase Storage
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <div className="relative">
+ *   <img src={profilePicture} alt="Profile" />
+ *   <PhotoUpload 
+ *     onPhotoUploaded={(url) => {
+ *       setProfilePicture(url);
+ *       showSuccessMessage("Photo updated!");
+ *     }}
+ *   />
+ * </div>
+ * ```
+ */
+
     import { uploadProfilePhoto } from "@/lib/actions/profile";
     import { useRef, useState } from "react";
 
     export default function PhotoUpload({
     onPhotoUploaded,
     }: {
+    /** Callback with the uploaded photo URL on successful upload */
     onPhotoUploaded: (url: string) => void;
     }) {
     const [uploading, setUploading] = useState<boolean>(false);

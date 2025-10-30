@@ -1,16 +1,57 @@
 "use client";
 
+/**
+ * MessageNotification Component
+ * 
+ * Toast notification displayed when a new message is received from a match.
+ * Shows sender's avatar, name, message preview, and timestamp.
+ * Auto-dismisses after 5 seconds with smooth slide-in/out animations.
+ * 
+ * Key Features:
+ * - Auto-dismiss after 5 seconds
+ * - Manual dismiss with close button
+ * - Quick action to open chat immediately
+ * - Message preview with 2-line clamp
+ * - Formatted timestamp in Philippine timezone
+ * - Slide-in animation from the top-right
+ * - Cosmic theme with glass-morphism
+ * - "Tap to reply" indicator
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * {notification && (
+ *   <MessageNotification 
+ *     senderId={notification.senderId}
+ *     senderName={notification.senderName}
+ *     senderAvatar={notification.senderAvatar}
+ *     messagePreview={notification.messageText}
+ *     sentAt={notification.timestamp}
+ *     onClose={() => setNotification(null)}
+ *     onOpenChat={(id) => router.push(`/chat/${id}`)}
+ *   />
+ * )}
+ * ```
+ */
+
 import { useEffect, useState } from "react";
 
 const DEFAULT_AVATAR = "/default-avatar.svg";
 
 interface MessageNotificationProps {
+    /** ID of the user who sent the message */
     senderId: string;
+    /** Display name of the sender */
     senderName: string;
+    /** URL of sender's profile picture (optional) */
     senderAvatar?: string | null;
+    /** Text content of the message (truncated if too long) */
     messagePreview: string;
+    /** ISO timestamp when message was sent */
     sentAt?: string;
+    /** Callback to close/dismiss the notification */
     onClose: () => void;
+    /** Callback to navigate to chat with the sender */
     onOpenChat: (senderId: string) => void;
 }
 

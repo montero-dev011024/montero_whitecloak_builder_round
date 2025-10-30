@@ -1,11 +1,43 @@
+    /**
+ * MatchNotification Component
+ * 
+ * Toast notification that appears when two users mutually like each other.
+ * Displays a celebration message with the matched user's profile picture.
+ * Auto-dismisses after 5 seconds with smooth slide-in/out animations.
+ * 
+ * Key Features:
+ * - Auto-dismiss after 5 seconds
+ * - Manual dismiss with close button
+ * - Quick action to start chatting immediately
+ * - "Later" option to dismiss without navigating
+ * - Slide-in animation from the right
+ * - Cosmic theme with golden accents
+ * - Responsive positioning (top-right corner)
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * {showMatchNotification && (
+ *   <MatchNotification 
+ *     match={newMatchedUser}
+ *     onClose={() => setShowMatchNotification(false)}
+ *     onStartChat={() => router.push(`/chat/${newMatchedUser.id}`)}
+ *   />
+ * )}
+ * ```
+ */
+
     import { UserProfile } from "@/app/profile/page";
     import { useEffect, useState } from "react";
 
     const DEFAULT_AVATAR = "/default-avatar.svg";
 
     interface MatchNotificationProps {
+    /** Matched user's profile to display */
     match: UserProfile;
+    /** Callback to close/dismiss the notification */
     onClose: () => void;
+    /** Callback to navigate to chat with the matched user */
     onStartChat: () => void;
     }
 

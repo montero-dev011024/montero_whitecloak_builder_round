@@ -1,11 +1,37 @@
 "use client";
 
+/**
+ * ChatHeader Component
+ * 
+ * Displays the header section of a chat conversation with a matched user.
+ * Shows user information including profile picture, name, age, and online status.
+ * Provides navigation back button and video call initiation button.
+ * 
+ * Key Features:
+ * - User profile display with avatar and basic info
+ * - Online/offline status indicator
+ * - Back navigation button
+ * - Video call button with cosmic theme styling
+ * - Responsive design for mobile and desktop
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <ChatHeader 
+ *   user={matchedUserProfile} 
+ *   onVideoCall={() => initiateVideoCall()}
+ * />
+ * ```
+ */
+
 import { UserProfile } from "@/app/profile/page";
 import { calculateAge } from "@/lib/helpers/calculate-age";
 import { useRouter } from "next/navigation";
 
 interface ChatHeaderProps {
+  /** User profile object containing name, age, avatar, and status */
   user: UserProfile;
+  /** Optional callback function to initiate a video call */
   onVideoCall?: () => void;
 }
 export default function ChatHeader({ user, onVideoCall }: ChatHeaderProps) {

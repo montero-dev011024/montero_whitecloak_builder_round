@@ -1,7 +1,24 @@
 /**
- * Calculate age from birthdate
- * @param birthdate - ISO date string or Date object
- * @returns Age in years
+ * Age and Birthdate Helper Functions
+ * 
+ * Utility functions for calculating age, formatting dates, and determining zodiac signs
+ * from birthdate information. Used throughout the app for profile display.
+ * 
+ * @module lib/helpers/calculate-age
+ */
+
+/**
+ * Calculates a person's current age from their birthdate
+ * Accounts for month and day to determine if birthday has passed this year
+ * 
+ * @param birthdate - ISO date string (YYYY-MM-DD) or Date object
+ * @returns Age in complete years
+ * 
+ * @example
+ * ```typescript
+ * const age = calculateAge("1995-06-15");
+ * console.log(`User is ${age} years old`);
+ * ```
  */
 export function calculateAge(birthdate: string | Date): number {
   const birth = typeof birthdate === "string" ? new Date(birthdate) : birthdate;
@@ -18,9 +35,17 @@ export function calculateAge(birthdate: string | Date): number {
 }
 
 /**
- * Format birthdate to readable format
- * @param birthdate - ISO date string
+ * Formats a birthdate into a human-readable string
+ * Uses US English locale with full month name
+ * 
+ * @param birthdate - ISO date string (YYYY-MM-DD)
  * @returns Formatted date string (e.g., "January 1, 1990")
+ * 
+ * @example
+ * ```typescript
+ * const formatted = formatBirthdate("1990-01-01");
+ * console.log(formatted); // "January 1, 1990"
+ * ```
  */
 export function formatBirthdate(birthdate: string): string {
   const date = new Date(birthdate);
@@ -32,9 +57,21 @@ export function formatBirthdate(birthdate: string): string {
 }
 
 /**
- * Get zodiac sign from birthdate
- * @param birthdate - ISO date string
- * @returns Zodiac sign name
+ * Determines a person's zodiac/astrological sign from their birthdate
+ * Based on traditional Western astrology date ranges
+ * 
+ * Zodiac Signs Covered:
+ * - Capricorn, Aquarius, Pisces, Aries, Taurus, Gemini
+ * - Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius
+ * 
+ * @param birthdate - ISO date string (YYYY-MM-DD)
+ * @returns Zodiac sign name (e.g., "Aries", "Taurus") or "Unknown" if calculation fails
+ * 
+ * @example
+ * ```typescript
+ * const sign = getZodiacSign("1995-06-15");
+ * console.log(`Your sign is ${sign}`); // "Your sign is Gemini"
+ * ```
  */
 export function getZodiacSign(birthdate: string): string {
   const date = new Date(birthdate);

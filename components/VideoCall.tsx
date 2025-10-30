@@ -1,3 +1,44 @@
+/**
+ * VideoCall Component
+ * 
+ * Full-screen video call interface powered by Stream Video SDK.
+ * Handles both outgoing and incoming video calls between matched users.
+ * Provides controls for camera, microphone, and ending the call.
+ * 
+ * Key Features:
+ * - WebRTC-powered real-time video and audio
+ * - Speaker layout showing all participants
+ * - Built-in call controls (camera, mic, screen share, end call)
+ * - Automatic call joining for incoming calls
+ * - Call creation for outgoing calls
+ * - Loading states during initialization
+ * - Error handling with user-friendly messages
+ * - Proper cleanup on unmount to prevent memory leaks
+ * - Prevents duplicate join attempts
+ * - Full-screen overlay with black background
+ * 
+ * Integration:
+ * - Requires Stream Video API key and token
+ * - Works with Stream Chat for call notifications
+ * - Called from StreamChatInterface component
+ * - Automatically disconnects on component unmount
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * {showVideoCall && (
+ *   <VideoCall 
+ *     callId={videoCallId}
+ *     onCallEnd={() => {
+ *       setShowVideoCall(false);
+ *       setVideoCallId("");
+ *     }}
+ *     isIncoming={false}
+ *   />
+ * )}
+ * ```
+ */
+
 import { getStreamVideoToken } from "@/lib/actions/stream";
 import {
   Call,
@@ -13,8 +54,11 @@ import { useEffect, useRef, useState } from "react";
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 
 interface VideoCallProps {
+  /** Unique identifier for the video call session */
   callId: string;
+  /** Callback when user ends the call */
   onCallEnd: () => void;
+  /** Whether this is an incoming call (join) vs outgoing (create) */
   isIncoming?: boolean;
 }
 

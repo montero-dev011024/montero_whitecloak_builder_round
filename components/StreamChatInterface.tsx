@@ -1,3 +1,48 @@
+/**
+ * StreamChatInterface Component
+ * 
+ * Complete chat interface powered by Stream Chat SDK.
+ * Handles real-time messaging, typing indicators, video call initiation,
+ * and incoming call notifications between matched users.
+ * 
+ * Key Features:
+ * - Real-time message sending and receiving via Stream Chat
+ * - Typing indicator detection and display
+ * - Message history loading (last 50 messages)
+ * - Auto-scroll to bottom on new messages
+ * - Manual scroll-to-bottom button when scrolled up
+ * - Video call initiation and handling
+ * - Incoming call notification with accept/decline
+ * - Message timestamp formatting
+ * - Keystroke events for typing indicators
+ * - Proper cleanup on component unmount
+ * - Error handling with user feedback
+ * - Loading states during initialization
+ * - Cosmic theme styling throughout
+ * 
+ * Integration:
+ * - Requires authenticated user
+ * - Creates/joins Stream Chat channel automatically
+ * - Integrates with VideoCall component
+ * - Exposes handleVideoCall via ref for external triggers
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * const chatRef = useRef<{ handleVideoCall: () => void }>(null);
+ * 
+ * <StreamChatInterface 
+ *   otherUser={matchedUser}
+ *   ref={chatRef}
+ * />
+ * 
+ * // Trigger video call from parent
+ * <button onClick={() => chatRef.current?.handleVideoCall()}>
+ *   Start Video Call
+ * </button>
+ * ```
+ */
+
 import { UserProfile } from "@/app/profile/page";
 import {
   createOrGetChannel,
@@ -16,16 +61,24 @@ import { Channel, Event, StreamChat } from "stream-chat";
 import VideoCall from "./VideoCall";
 
 interface Message {
+  /** Unique message ID from Stream */
   id: string;
+  /** Text content of the message */
   text: string;
+  /** Whether message was sent by current user or other user */
   sender: "me" | "other";
+  /** When the message was sent */
   timestamp: Date;
+  /** ID of the user who sent the message */
   user_id: string;
 }
 
 interface VideoCallMessagePayload {
+  /** ID of the video call */
   call_id?: string;
+  /** ID of user initiating the call */
   caller_id?: string;
+  /** Name of user initiating the call */
   caller_name?: string;
 }
 

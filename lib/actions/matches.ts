@@ -1,16 +1,43 @@
 "use server";
 
+/**
+ * Matching System Actions
+ * 
+ * Server-side functions for handling user matching logic including:
+ * - Finding potential matches based on user preferences
+ * - Liking/passing on profiles
+ * - Detecting mutual likes (matches)
+ * - Managing user's match list
+ * 
+ * @module lib/actions/matches
+ */
+
 import type { UserPreferences, UserProfile } from "@/app/profile/page";
 import { mapUserRowToProfile, userWithProfileSelect } from "@/lib/profile-utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "../supabase/server";
 
+/** Maximum number of potential matches to return at once */
 const MATCH_LIMIT = 50;
 
+/**
+ * Response type for the likeUser function
+ * Indicates whether the like resulted in a mutual match
+ */
 type LikeResponse =
     | { success: true; isMatch: false }
     | { success: true; isMatch: true; matchedUser: UserProfile };
 
+/**
+ * Collects all user IDs that are in a blocking relationship with the given user
+ * Includes both users that this user has blocked and users who have blocked this user
+ * 
+ * @param supabase - Supabase client instance
+ * @param userId - ID of the current user
+ * @returns Set of blocked user IDs
+ * @throws Error if database query fails
+ * @private
+ */
 const collectBlockedUserIds = async (
     supabase: SupabaseClient,
     userId: string
@@ -38,6 +65,13 @@ const collectBlockedUserIds = async (
     return blocked;
 };
 
+/**
+ * Gets the current authenticated user's context
+ * 
+ * @returns Object containing Supabase client and user ID
+ * @throws Error if user is not authenticated
+ * @private
+ */
 const getCurrentUser = async () => {
     const supabase = await createClient();
     const {
@@ -51,10 +85,58 @@ const getCurrentUser = async () => {
     return { supabase, userId: user.id } as const;
 };
 
+/**
+ * Fetches potential matches for the current user based on their preferences
+ * 
+ * Excludes:
+ * - The current user themselves
+ * - Users the current user has already liked or passed on
+ * - Users the current user has already matched with
+ * - Users in blocking relationships (both directions)
+ * - Users who don't match the gender preference filters
+ * 
+ * @returns Array of UserProfile objects matching user's preferences
+ * @throws Error if user not authenticated or database query fails
+ * 
+ * @example
+ * ```typescript
+ * const matches = await getPotentialMatches();
+ * console.log(`Found ${matches.length} potential matches`);
+ * ```
+ */
 export async function getPotentialMatches(): Promise<UserProfile[]> {
     const { supabase, userId } = await getCurrentUser();
 
     const blockedUserIds = await collectBlockedUserIds(supabase, userId);
+
+    // Get users that current user has already interacted with (liked or passed)
+    const { data: existingLikes, error: likesError } = await supabase
+        .from("likes")
+        .select("to_user_id")
+        .eq("from_user_id", userId);
+
+    if (likesError) {
+        throw new Error("Failed to fetch existing interactions");
+    }
+
+    const interactedUserIds = new Set(existingLikes?.map((like) => like.to_user_id) ?? []);
+
+    // Get users that current user has matched with
+    const { data: existingMatches, error: matchesError } = await supabase
+        .from("matches")
+        .select("user1_id, user2_id")
+        .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+        .eq("is_active", true);
+
+    if (matchesError) {
+        throw new Error("Failed to fetch existing matches");
+    }
+
+    // Add matched user IDs to the set of users to exclude
+    for (const match of existingMatches ?? []) {
+        const otherUserId = match.user1_id === userId ? match.user2_id : match.user1_id;
+        interactedUserIds.add(otherUserId);
+    }
 
     const { data: potentialMatches, error } = await supabase
         .from("users")
@@ -83,6 +165,7 @@ export async function getPotentialMatches(): Promise<UserProfile[]> {
 
     return (potentialMatches ?? [])
         .filter((match) => !blockedUserIds.has(match.id))
+        .filter((match) => !interactedUserIds.has(match.id)) // Exclude already liked/passed/matched users
         .filter((match) => {
             if (!genderPreferences.length) {
                 return true;
@@ -93,6 +176,22 @@ export async function getPotentialMatches(): Promise<UserProfile[]> {
         .map((match) => mapUserRowToProfile(match));
 }
 
+/**
+ * Records a "like" from the current user to another user
+ * Checks if the other user has also liked them back (mutual like = match)
+ * 
+ * @param toUserId - ID of the user being liked
+ * @returns Object indicating success and whether it resulted in a match
+ * @throws Error if user tries to like themselves, a blocked user, or on database failure
+ * 
+ * @example
+ * ```typescript
+ * const result = await likeUser("user-123");
+ * if (result.isMatch) {
+ *   console.log("It's a match!", result.matchedUser);
+ * }
+ * ```
+ */
 export async function likeUser(toUserId: string): Promise<LikeResponse> {
     const { supabase, userId } = await getCurrentUser();
 
@@ -163,6 +262,22 @@ export async function likeUser(toUserId: string): Promise<LikeResponse> {
     };
 }
 
+/**
+ * Fetches all matched users (mutual likes) for the current user
+ * Excludes users in blocking relationships
+ * 
+ * @returns Array of UserProfile objects representing matched users
+ * @throws Error if user not authenticated or database query fails
+ * 
+ * @example
+ * ```typescript
+ * const matches = await getUserMatches();
+ * console.log(`You have ${matches.length} matches!`);
+ * matches.forEach(match => {
+ *   console.log(`Matched with ${match.full_name}`);
+ * });
+ * ```
+ */
 export async function getUserMatches(): Promise<UserProfile[]> {
     const { supabase, userId } = await getCurrentUser();
 
