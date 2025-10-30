@@ -617,31 +617,6 @@ chore: update dependencies
 
 ---
 
-## 📄 License
-
-This project is proprietary software developed for Whitecloak/Montero. All rights reserved.
-
----
-
-## 👥 Team
-
-- **Project**: Marahuyo Dating App
-- **Organization**: Montero (Whitecloak)
-- **Repository**: montero-wc-dating-app
-- **Owner**: montero-dev011024
-
----
-
-## 🌟 Acknowledgments
-
-Special thanks to:
-- **Supabase** for database and authentication infrastructure
-- **Stream** for chat and video calling capabilities
-- **Next.js** team for the excellent framework
-- **Tailwind CSS** for the utility-first styling approach
-
----
-
 **Last Updated**: October 30, 2025  
 **Version**: 1.0.0 (Production Ready)  
 **Status**: Feature Complete - Ready for Testing
