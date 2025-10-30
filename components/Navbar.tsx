@@ -2,13 +2,37 @@
 
 import { useAuth } from "@/contexts/auth-contexts";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function Navbar() {
     const { signOut, user } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const pathname = usePathname();
+    const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function loadProfilePicture() {
+            if (!user?.id) return;
+            
+            try {
+                const supabase = createClient();
+                const { data, error } = await supabase
+                    .from("profiles")
+                    .select("profile_picture_url")
+                    .eq("user_id", user.id)
+                    .single();
+
+                if (error) throw error;
+                setProfilePictureUrl(data?.profile_picture_url ?? null);
+            } catch (error) {
+                console.error("Error loading profile picture:", error);
+            }
+        }
+
+        loadProfilePicture();
+    }, [user?.id]);
 
     const handleSignOut = async () => {
         await signOut();
@@ -82,27 +106,29 @@ export default function Navbar() {
                             <div className="relative">
                                 <button
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 hover:shadow-md"
-                                    style={{
-                                        backgroundColor: "#F7F4F3",
-                                        border: "2px solid #583C5C",
-                                        color: "#583C5C",
-                                    }}
+                                    className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 transition-all duration-200 hover:shadow-md hover:ring-2 group"
+                                    style={{ borderRadius: "50%" }}
                                 >
-                                    <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-br" style={{ background: "linear-gradient(135deg, #583C5C 0%, #E8B960 100%)" }}>
-                                        <span className="text-white text-xs font-bold">
-                                            {user.email?.charAt(0).toUpperCase()}
-                                        </span>
+                                    <img
+                                        src={profilePictureUrl || "/default-avatar.svg"}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-200 rounded-full flex items-center justify-center">
+                                        <svg
+                                            className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                                            />
+                                        </svg>
                                     </div>
-                                    <span className="text-sm font-medium hidden lg:inline">{user.email?.split("@")[0]}</span>
-                                    <svg
-                                        className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                                    </svg>
                                 </button>
 
                                 {/* Dropdown Menu */}
@@ -111,11 +137,11 @@ export default function Navbar() {
                                         className="absolute right-0 mt-2 w-48 rounded-lg shadow-lg border border-gray-200 z-50 animate-in fade-in-50 slide-in-from-top-2"
                                         style={{ backgroundColor: "#F7F4F3" }}
                                     >
-                                        <div className="p-3 border-b border-gray-200">
-                                            <p className="text-xs text-gray-500">Signed in as</p>
+                                        <div className="p-4 border-b border-gray-200">
                                             <p className="text-sm font-semibold" style={{ color: "#583C5C" }}>
-                                                {user.email}
+                                                {user.email?.split("@")[0]}
                                             </p>
+                                            <p className="text-xs text-gray-500 mt-1">{user.email}</p>
                                         </div>
                                         <Link
                                             href="/profile"
@@ -123,15 +149,7 @@ export default function Navbar() {
                                             style={{ color: "#3D3538" }}
                                             onClick={() => setIsDropdownOpen(false)}
                                         >
-                                            👤 Profile
-                                        </Link>
-                                        <Link
-                                            href="/settings"
-                                            className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
-                                            style={{ color: "#3D3538" }}
-                                            onClick={() => setIsDropdownOpen(false)}
-                                        >
-                                            ⚙️ Settings
+                                            👤 View Profile
                                         </Link>
                                         <button
                                             onClick={handleSignOut}
@@ -159,17 +177,28 @@ export default function Navbar() {
                         {user ? (
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="p-2 rounded-full transition-all hover:bg-gray-100"
-                                style={{ color: "#583C5C" }}
+                                className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 transition-all group"
                             >
-                                <svg
-                                    className="w-6 h-6"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
+                                <img
+                                    src={profilePictureUrl || "/default-avatar.svg"}
+                                    alt="Profile"
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity duration-200 rounded-full flex items-center justify-center">
+                                    <svg
+                                        className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                                        />
+                                    </svg>
+                                </div>
                             </button>
                         ) : (
                             <Link
@@ -186,6 +215,12 @@ export default function Navbar() {
                 {/* Mobile Menu */}
                 {isDropdownOpen && user && (
                     <div className="md:hidden pb-4 space-y-2 animate-in fade-in-50 slide-in-from-top-2">
+                        <div className="px-4 py-2 border-b border-gray-200">
+                            <p className="text-sm font-semibold" style={{ color: "#583C5C" }}>
+                                {user.email?.split("@")[0]}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">{user.email}</p>
+                        </div>
                         <Link
                             href="/"
                             className="block px-4 py-2 text-sm rounded hover:bg-gray-100 transition-colors"
@@ -224,20 +259,12 @@ export default function Navbar() {
                             style={{ color: "#3D3538" }}
                             onClick={() => setIsDropdownOpen(false)}
                         >
-                            Profile
-                        </Link>
-                        <Link
-                            href="/settings"
-                            className="block px-4 py-2 text-sm rounded hover:bg-gray-100 transition-colors"
-                            style={{ color: "#3D3538" }}
-                            onClick={() => setIsDropdownOpen(false)}
-                        >
-                            Settings
+                            View Profile
                         </Link>
                         
                         <button
                             onClick={handleSignOut}
-                            className="w-full text-left px-4 py-2 text-sm rounded transition-colors"
+                            className="w-full text-left px-4 py-2 text-sm rounded transition-colors border-t border-gray-200"
                             style={{ color: "#E63946" }}
                         >
                             Sign Out

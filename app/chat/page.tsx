@@ -1,6 +1,7 @@
 "use client";
 
 import { getUserMatches } from "@/lib/actions/matches";
+import { getLastMessage } from "@/lib/actions/stream";
 import { useEffect, useState } from "react";
 import { UserProfile } from "../profile/page";
 import Link from "next/link";
@@ -21,13 +22,20 @@ export default function ChatPage() {
     async function loadMatches() {
       try {
         const userMatches = await getUserMatches();
-        const chatData: ChatData[] = userMatches.map((match) => ({
-          id: match.id,
-          user: match,
-          lastMessage: "Start your conversation!",
-          lastMessageTime: match.created_at,
-          unreadCount: 0,
-        }));
+        
+        const chatDataPromises = userMatches.map(async (match) => {
+          const lastMessageData = await getLastMessage(match.id);
+          
+          return {
+            id: match.id,
+            user: match,
+            lastMessage: lastMessageData?.text || "Start your conversation!",
+            lastMessageTime: lastMessageData?.timestamp || match.created_at,
+            unreadCount: 0,
+          };
+        });
+
+        const chatData = await Promise.all(chatDataPromises);
         setChats(chatData);
         console.log(userMatches);
       } catch (error) {
@@ -53,9 +61,7 @@ export default function ChatPage() {
       hour12: true,
     };
 
-    if (diffInHours < 1) {
-      return "Just now";
-    } else if (diffInHours < 24) {
+    if (diffInHours < 24) {
       return date.toLocaleTimeString("en-PH", phtOptions);
     } else if (diffInHours < 48) {
       return "Yesterday";

@@ -234,13 +234,16 @@
             setMatchedUser(null);
         }
 
-            function handleStartChat() {
-                handleCloseMatchNotification();
+        function handleStartChat() {
+            if (matchedUser?.id) {
+                router.push(`/chat/${matchedUser.id}`);
             }
+            handleCloseMatchNotification();
+        }
 
         if (loading) {
             return (
-                <div className="h-full bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+                <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto" />
                         <p className="mt-4 text-gray-600 dark:text-gray-400">
@@ -252,8 +255,8 @@
         }
 
         return (
-            <div className="h-full overflow-y-auto bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
-                <div className="container mx-auto px-4 py-8">
+            <div className="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+                <div className="container mx-auto px-4 py-8 pb-20">
                     <header className="mb-8">
                         <div className="flex items-center justify-between mb-4">
                             <button
@@ -566,7 +569,7 @@
                         </div>
                     </section>
 
-                    <div className="max-w-md mx-auto">
+                    <div className="max-w-md mx-auto h-auto overflow-hidden">
                         {hasMatches && currentPotentialMatch ? (
                             <>
                                 <MatchCard 

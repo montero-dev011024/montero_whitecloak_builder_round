@@ -229,3 +229,60 @@ export async function getStreamVideoToken() {
     userImage: profileImage,
   };
 }
+
+export async function getLastMessage(otherUserId: string): Promise<{
+  text: string;
+  timestamp: string;
+} | null> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  const sortedIds = [user.id, otherUserId].sort();
+  const combinedIds = sortedIds.join("_");
+
+  let hash = 0;
+  for (let i = 0; i < combinedIds.length; i++) {
+    const char = combinedIds.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+
+  const channelId = `match_${Math.abs(hash).toString(36)}`;
+
+  const serverClient = StreamChat.getInstance(
+    process.env.NEXT_PUBLIC_STREAM_API_KEY!,
+    process.env.STREAM_API_SECRET!
+  );
+
+  try {
+    const channel = serverClient.channel("messaging", channelId);
+    const state = await channel.query({ messages: { limit: 1 } });
+
+    if (!state.messages || state.messages.length === 0) {
+      return null;
+    }
+
+    const lastMsg = state.messages[state.messages.length - 1];
+    const createdAt = lastMsg.created_at as any;
+    const timestamp = typeof createdAt === "string" 
+      ? createdAt 
+      : createdAt instanceof Date 
+        ? createdAt.toISOString()
+        : new Date().toISOString();
+
+    return {
+      text: lastMsg.text || "",
+      timestamp,
+    };
+  } catch (error) {
+    console.error("Error fetching last message:", error);
+    return null;
+  }
+}

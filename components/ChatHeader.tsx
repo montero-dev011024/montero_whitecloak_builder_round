@@ -40,7 +40,9 @@ export default function ChatHeader({ user, onVideoCall }: ChatHeaderProps) {
                 alt={user.full_name}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
+              {user.is_online && (
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
+              )}
             </div>
 
             <div>
@@ -48,7 +50,7 @@ export default function ChatHeader({ user, onVideoCall }: ChatHeaderProps) {
                 {user.full_name}, {calculateAge(user.birthdate)}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                @{user.full_name}
+                {user.is_online ? "Active now" : "Offline"}
               </p>
             </div>
           </div>

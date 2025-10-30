@@ -50,6 +50,19 @@ body {
     @apply bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
   }
 
+  /* 3D flip card styles */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
   /* Custom scrollbar styles for chat */
   .chat-scrollbar {
     scrollbar-width: thin;

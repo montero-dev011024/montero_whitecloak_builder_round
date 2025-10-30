@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-contexts";
 import Navbar from "@/components/Navbar";
+import MessageNotificationListener from "@/components/MessageNotificationListener";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <AuthProvider>
           <div className="min-h-screen bg-zinc-50 font-sans dark:bg-black text-zinc-950 dark:text-zinc-50">
             <Navbar />
+            <MessageNotificationListener />
             {children}
           </div>
         </AuthProvider>
