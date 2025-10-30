@@ -274,21 +274,35 @@ export default function MessageNotificationListener() {
                 console.log("🔔 [Notification Listener] ✅ Listener setup complete with", channels.length, "channels");
 
                 // Listen for when the user is added to a new channel
-                const handleChannelAdded = (event: Event) => {
-                    const channel = event.channel;
-                    if (channel && !channelsRef.current.find(ch => ch.id === channel.id)) {
-                        channelsRef.current.push(channel);
-                        
-                        const boundHandler = (messageEvent: Event) => {
-                            handleMessageEvent(messageEvent).catch((error) => {
-                                console.error("Message listener error:", error);
-                            });
-                        };
+                const handleChannelAdded = async (event: Event) => {
+                    const channelResponse = event.channel;
+                    if (channelResponse && !channelsRef.current.find(ch => ch.id === channelResponse.id)) {
+                        try {
+                            // Get the actual Channel object from the client
+                            const channel = client.channel(channelResponse.type || "messaging", channelResponse.id || "");
+                            
+                            // Watch the channel to initialize it properly
+                            await channel.watch();
+                            
+                            if (!isMountedRef.current) {
+                                return;
+                            }
+                            
+                            channelsRef.current.push(channel);
+                            
+                            const boundHandler = (messageEvent: Event) => {
+                                handleMessageEvent(messageEvent).catch((error) => {
+                                    console.error("Message listener error:", error);
+                                });
+                            };
 
-                        channel.on("message.new", boundHandler);
-                        unsubscribeHandlersRef.current.push(() => channel.off("message.new", boundHandler));
-                        
-                        console.log("Started watching new channel:", channel.id);
+                            channel.on("message.new", boundHandler);
+                            unsubscribeHandlersRef.current.push(() => channel.off("message.new", boundHandler));
+                            
+                            console.log("Started watching new channel:", channelResponse.id);
+                        } catch (error) {
+                            console.error("Error watching new channel:", error);
+                        }
                     }
                 };
 
