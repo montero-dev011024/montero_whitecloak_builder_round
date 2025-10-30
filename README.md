@@ -1,6 +1,6 @@
-# Hearts Dating App 💜
+# Marahuyo Dating App 💫
 
-A modern, full-stack dating application built with **Next.js 16**, **React 19**, **Supabase**, and **Tailwind CSS v4**. Currently in **active development** with core authentication infrastructure in place.
+A modern, full-stack dating application built with **Next.js 16**, **React 19**, **Supabase**, **Stream Chat & Video**, and **Tailwind CSS v4**. Features a cosmic-themed UI, real-time messaging, video calls, and intelligent matching system.
 
 ---
 
@@ -8,11 +8,12 @@ A modern, full-stack dating application built with **Next.js 16**, **React 19**,
 
 - [Project Overview](#project-overview)
 - [System Architecture](#system-architecture)
-- [Current Progress](#current-progress)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Development Guide](#development-guide)
 - [Project Structure](#project-structure)
-- [Key Features](#key-features)
+- [Documentation](#documentation)
 - [Known Issues](#known-issues)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
@@ -21,25 +22,14 @@ A modern, full-stack dating application built with **Next.js 16**, **React 19**,
 
 ## 🎯 Project Overview
 
-**Marahuyo** is a dating application designed to help users find meaningful connections. The current iteration focuses on establishing a solid authentication foundation and user onboarding flow, with dating features (matching, profiles, messaging) coming in subsequent phases.
+**Marahuyo** (Filipino: "to be enchanted") is a feature-complete dating application designed to help users find meaningful connections through an intuitive, cosmic-themed interface. The app includes real-time messaging, video calling, intelligent matching algorithms, and comprehensive user profiles.
 
+### Core Philosophy
 
-Suggestions
-
-- 
-
-### Tech Stack
-
-- **Frontend**: Next.js 16 (App Router) + React 19 + TypeScript 5
-- **Styling**: Tailwind CSS v4 + PostCSS
-- **Backend**: Supabase (PostgreSQL + Auth)
-- **Deployment**: Vercel (recommended) or self-hosted Node.js
-
-### Brand Colors
-
-- **Primary**: `#583C5C` (Deep Purple)
-- **Accent**: `#E8B960` (Gold)
-- **Background**: `#F7F4F3` (Cream)
+- **User Safety First**: Block/unblock functionality, match validation, and secure communication
+- **Real-time Experience**: Live messaging, typing indicators, and instant match notifications
+- **Privacy Focused**: Row-level security, secure file uploads, and controlled data access
+- **Beautiful UX**: Cosmic theme with glass-morphism, golden accents, and smooth animations
 
 ---
 
@@ -52,179 +42,185 @@ Suggestions
 │         Next.js 16 App Router (React 19)                │
 │  ┌───────────────────────────────────────────────────┐  │
 │  │  app/layout.tsx → <AuthProvider>                  │  │
+│  │  + <MessageNotificationListener>                  │  │
 │  │  Wraps entire application                         │  │
 │  └───────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
          │
-    ┌────┴──────┬──────────────┐
-    │            │              │
-  page.tsx   auth/page.tsx  [Future Pages]
-  (Landing)  (Auth Flow)    (Profile, Messages, etc.)
-    │            │              │
-    └────────┬───┴──────────────┘
+    ┌────┴──────┬──────────────┬──────────────┐
+    │            │              │              │
+  Landing    Auth Page    Discover Page   Profile Page
+  (Home)     (Sign In/Up)  (Swipe Cards)  (View/Edit)
+    │            │              │              │
+    └────────┬───┴──────────────┴──────────────┘
              │
        ┌─────▼────────────────┐
        │ AuthContext (Client) │
        │ useAuth() hook       │
+       │ + Activity Tracking  │
        └─────┬────────────────┘
              │
     ┌────────┴─────────────┐
     │                      │
-Browser Client        Subscription
-(Anon Key)       (onAuthStateChange)
+Supabase Client      Stream Chat/Video
+(Auth + Database)    (Messaging + Calls)
     │                      │
     └─────────┬────────────┘
               │
       ┌───────▼──────────┐
-      │  Supabase Cloud  │
-      │  (PostgreSQL +   │
-      │   Auth)          │
+      │  Backend Stack   │
+      │  - Supabase DB   │
+      │  - Supabase Auth │
+      │  - Stream API    │
       └──────────────────┘
 ```
 
-### Authentication Flow
+### Key Components
 
-#### On App Load
+#### Authentication System
+- **AuthProvider**: Global auth state management with React Context
+- **Online Status**: Real-time presence tracking with 60-second heartbeat
+- **Session Management**: Automatic refresh and cross-tab synchronization
+- **Protected Routes**: Conditional rendering based on auth state
 
-```
-1. AuthProvider initializes in app/layout.tsx
-2. useEffect calls supabase.auth.getSession()
-3. If session exists, user state is populated
-4. Subscribe to onAuthStateChange() for real-time updates
-5. Any auth event (sign-in, sign-out, token refresh) triggers subscription
-6. User state updates → components re-render automatically
-```
+#### Database Architecture
+- **users**: Core user data (name, bio, birthdate, preferences)
+- **profiles**: Extended details (photos, physical attributes, lifestyle)
+- **matches**: Mutual likes and match relationships
+- **likes**: User like/pass actions for discovery
+- **blocks**: Blocked user relationships
+- **user_interests**: User's selected interests
 
-#### Sign-Up Flow
-
-```
-User → /auth page → Enter email/password → Click "Sign Up"
-  → supabase.auth.signUp({ email, password })
-  → User created in Supabase
-  → Confirmation email sent (if enabled)
-  → onAuthStateChange fires
-  → User state updates
-  → Redirect to / (homepage)
-```
-
-#### Sign-Out Flow
-
-```
-User clicks "Sign Out" → signOut() from useAuth()
-  → supabase.auth.signOut()
-  → Session invalidated
-  → onAuthStateChange fires with session=null
-  → User state = null
-  → Protected pages redirect to /auth
-```
-
-### Supabase Client Architecture
-
-The application uses **two distinct Supabase clients** for security:
-
-#### Browser Client (`lib/supabase/client.ts`)
-
-- **Environment**: Client-side React components
-- **Uses**: `NEXT_PUBLIC_SUPABASE_ANON_KEY` (public)
-- **Used in**: Auth pages, auth-contexts.tsx
-- **Permissions**: Limited by Row-Level Security (RLS) policies
-- **Cannot**: Bypass security policies or access sensitive operations
-
-#### Server Client (`lib/supabase/server.ts`)
-
-- **Environment**: Server Components, API routes
-- **Uses**: `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (with cookie middleware)
-- **Used in**: Future API routes, server-side operations
-- **Permissions**: Can be configured with elevated credentials if needed
-- **Benefits**: Secure session handling via cookies (not accessible to JavaScript)
-
-### State Management
-
-Using **React Context API** for simplicity and built-in React 19 support:
-
-```typescript
-interface AuthContextType {
-  user: User | null;              // Supabase User object
-  loading: boolean;               // Auth state loading indicator
-  signOut: () => Promise<void>;   // Sign-out function
-}
-```
+#### Real-time Features
+- **Stream Chat**: Powered by Stream Chat SDK
+  - One-on-one messaging
+  - Typing indicators
+  - Message history
+  - Read receipts
+  - Channel management
+- **Stream Video**: Powered by Stream Video SDK
+  - WebRTC video calls
+  - Audio/video controls
+  - Screen sharing capability
+  - Call quality optimization
+- **Supabase Realtime**: Database change subscriptions
+  - New match notifications
+  - Profile updates
+  - Match list synchronization
 
 ---
 
-## 📊 Current Progress
+## ✨ Features
 
-### ✅ Completed
+### Completed Features
 
-- [X] **Project Setup**
+#### 🔐 Authentication & Security
+- ✅ Email/password authentication
+- ✅ Email verification
+- ✅ Session persistence across tabs
+- ✅ Automatic token refresh
+- ✅ Protected route guards
+- ✅ Online/offline status tracking
+- ✅ Activity heartbeat (60-second updates)
 
-  - Next.js 16 with App Router
-  - React 19 integration
-  - TypeScript strict mode enabled
-  - ESLint configuration
-- [X] **Authentication System**
+#### 👤 User Profiles
+- ✅ Complete profile creation and editing
+- ✅ Profile picture upload to Supabase Storage
+- ✅ Rich profile details (height, education, occupation, lifestyle)
+- ✅ Bio and personal information
+- ✅ Birthdate with automatic age calculation
+- ✅ Relationship goals and preferences
+- ✅ Profile picture with live preview
 
-  - Supabase integration (browser + server clients)
-  - Auth Context with useAuth() hook
-  - Real-time session subscription (onAuthStateChange)
-  - User state management and persistence
-- [X] **Pages**
+#### 💖 Discovery & Matching
+- ✅ Tinder-style swipeable cards
+- ✅ Swipe left (pass) / right (like) interactions
+- ✅ Mutual match detection
+- ✅ Match notification with instant chat option
+- ✅ Discovery preferences (age, distance, gender)
+- ✅ Real-time preference editing
+- ✅ Filter matches based on preferences
+- ✅ Prevent showing matched/blocked users
 
-  - Landing page (`app/page.tsx`) with hero section
-  - Authentication page (`app/auth/page.tsx`) with sign-up/sign-in toggle
-  - Root layout with AuthProvider wrapper
-- [X] **Styling**
+#### 💬 Messaging
+- ✅ Real-time one-on-one chat via Stream Chat
+- ✅ Message history with pagination
+- ✅ Typing indicators
+- ✅ Message timestamps (Philippine timezone)
+- ✅ Auto-scroll to latest messages
+- ✅ Manual scroll-to-bottom button
+- ✅ Toast notifications for new messages
+- ✅ Message notification listener (global)
 
-  - Tailwind CSS v4 with PostCSS
-  - Brand color system implemented
-  - Responsive design patterns
-  - Dark mode support (framework ready)
-- [X] **Developer Experience**
+#### 📹 Video Calling
+- ✅ WebRTC-powered video calls via Stream Video
+- ✅ Call initiation from chat header
+- ✅ Incoming call notifications
+- ✅ Accept/decline call options
+- ✅ Built-in call controls (camera, mic, end call)
+- ✅ Speaker layout for participants
+- ✅ Full-screen call interface
 
-  - Path aliases (`@/*` resolves to workspace root)
-  - Environment configuration (.env.local setup)
-  - AI agent coding guidelines (`.github/copilot-instructions.md`)
-  - Development workflow documentation
+#### 🎯 Matches Management
+- ✅ Grid view of all active matches
+- ✅ Real-time match updates (Supabase subscriptions)
+- ✅ Unmatch functionality with confirmation
+- ✅ Block user with optional reason
+- ✅ Navigate to chat from matches
+- ✅ View blocked users list
+- ✅ Unblock users
 
-### 🚧 In Progress / Known Issues
+#### 🎨 User Interface
+- ✅ Cosmic theme with gradient backgrounds
+- ✅ Animated starfield on landing/auth pages
+- ✅ Glass-morphism design elements
+- ✅ Golden accent colors throughout
+- ✅ Responsive design (mobile to desktop)
+- ✅ Loading states and skeletons
+- ✅ Error boundaries for crash prevention
+- ✅ Toast notifications with auto-dismiss
+- ✅ Smooth animations and transitions
+- ✅ Icon-based visual indicators
 
-- [ ] **Auth State Bug**: `loading` state initialized to `false` but never set to `true`
-  - Impact: No loading skeleton shown during initial auth check
-  - Fix: Set `loading = true` at start of useEffect in `contexts/auth-contexts.tsx`
+#### 🛡️ Safety Features
+- ✅ Block/unblock users
+- ✅ Blocked users management page
+- ✅ Block reason tracking
+- ✅ Prevent discovery of blocked users
+- ✅ Remove matches on block
+- ✅ Row-level security policies
 
-### ⏳ Planned (Next Phases)
+---
 
-- [ ] **User Profiles**
+## 🛠️ Tech Stack
 
-  - Profile schema (photos, bio, preferences)
-  - Profile creation on sign-up
-  - Profile editing interface
-  - Photo upload functionality
-- [ ] **Matching System**
+### Frontend
+- **Framework**: Next.js 16 (App Router)
+- **UI Library**: React 19
+- **Language**: TypeScript 5 (strict mode)
+- **Styling**: Tailwind CSS v4 + PostCSS
+- **State Management**: React Context API
+- **Image Handling**: Next.js Image component
 
-  - User discovery algorithm
-  - Swipe/like/pass interaction
-  - Match notification system
-- [ ] **Messaging**
+### Backend & Services
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Storage**: Supabase Storage (profile photos)
+- **Realtime**: Supabase Realtime (subscriptions)
+- **Messaging**: Stream Chat SDK
+- **Video Calls**: Stream Video SDK
 
-  - Real-time chat using Supabase Realtime
-  - Message history
-  - Notifications
-- [ ] **Safety & Moderation**
+### Development Tools
+- **Package Manager**: npm
+- **Linter**: ESLint
+- **TypeScript Config**: Path aliases (`@/*`)
+- **Environment**: `.env.local` for secrets
 
-  - Report user functionality
-  - Block/unblock users
-  - Account deletion flow
-- [ ] **Testing**
-
-  - Jest unit tests
-  - Integration tests
-  - E2E tests with Cypress/Playwright
-- [ ] **CI/CD**
-
-  - GitHub Actions workflows
-  - Automated linting and tests
-  - Deployment pipeline
+### Design System
+- **Primary**: `hsl(45 90% 55%)` (Golden)
+- **Accent**: `hsl(25 85% 55%)` (Warm Orange)
+- **Background**: `linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))` (Cosmic)
+- **Text**: `hsl(220 10% 65%)` to `hsl(220 10% 95%)` (Gray scale)
 
 ---
 
@@ -235,7 +231,8 @@ interface AuthContextType {
 - Node.js 18+ (LTS recommended)
 - npm 9+
 - Git
-- Supabase account (free tier works for development)
+- Supabase account (free tier works)
+- Stream account (free tier works)
 
 ### Installation
 
@@ -245,22 +242,43 @@ interface AuthContextType {
    git clone https://github.com/montero-dev011024/montero-wc-dating-app.git
    cd montero-wc-dating-app
    ```
+
 2. **Install dependencies**
 
    ```bash
    npm install
    ```
+
 3. **Configure environment variables**
+
    Create `.env.local` in the project root:
 
    ```env
+   # Supabase Configuration
    NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
-   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key_here
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+
+   # Stream Configuration
+   NEXT_PUBLIC_STREAM_API_KEY=your_stream_api_key_here
+   STREAM_API_SECRET=your_stream_api_secret_here
    ```
 
-   Get these values from your Supabase project settings.
-4. **Start the development server**
+   **Getting Supabase Keys:**
+   - Go to your Supabase project dashboard
+   - Settings → API → Project URL and API Keys
+   - Copy `URL`, `anon/public key`, and `service_role key`
+
+   **Getting Stream Keys:**
+   - Go to your Stream dashboard
+   - Create a new app or select existing
+   - Copy `App ID` (API Key) and `Secret`
+
+4. **Set up Supabase Database**
+
+   Run the SQL schema from `docs/DATABASE_ARCHITECTURE_DIAGRAM.md` in your Supabase SQL editor to create all necessary tables and policies.
+
+5. **Start the development server**
 
    ```bash
    npm run dev
@@ -288,25 +306,85 @@ npm start
 npm run lint
 ```
 
-### Key Files & Their Roles
+### Project Structure
 
-| File                                | Purpose                                  |
-| ----------------------------------- | ---------------------------------------- |
-| `app/layout.tsx`                  | Root layout, wraps app with AuthProvider |
-| `app/page.tsx`                    | Landing page (homepage)                  |
-| `app/auth/page.tsx`               | Authentication page (sign-up/sign-in)    |
-| `contexts/auth-contexts.tsx`      | Auth state management, useAuth() hook    |
-| `lib/supabase/client.ts`          | Browser Supabase client                  |
-| `lib/supabase/server.ts`          | Server Supabase client                   |
-| `tsconfig.json`                   | TypeScript configuration, path aliases   |
-| `.github/copilot-instructions.md` | AI coding agent guidelines               |
+```
+montero-wc-dating-app/
+├── app/                              # Next.js App Router
+│   ├── layout.tsx                   # Root layout with AuthProvider
+│   ├── page.tsx                     # Landing page (home)
+│   ├── auth/
+│   │   └── page.tsx                 # Authentication (sign in/up)
+│   ├── discover/
+│   │   ├── page.tsx                 # Swipe/discovery page
+│   │   └── list/
+│   │       └── page.tsx             # Matches list
+│   ├── chat/
+│   │   ├── page.tsx                 # Chat list/inbox
+│   │   └── [userId]/
+│   │       └── page.tsx             # Individual chat
+│   ├── profile/
+│   │   ├── page.tsx                 # Profile view
+│   │   └── edit/
+│   │       └── page.tsx             # Profile editor
+│   ├── block/
+│   │   └── page.tsx                 # Blocked users management
+│   └── globals.css                  # Global styles
+│
+├── components/                       # Reusable React components
+│   ├── ChatHeader.tsx               # Chat conversation header
+│   ├── ErrorBoundary.tsx            # Error boundary wrapper
+│   ├── MatchCard.tsx                # Swipeable match card
+│   ├── MatchNotification.tsx        # Match notification toast
+│   ├── MessageNotification.tsx      # Message notification toast
+│   ├── MessageNotificationListener.tsx  # Global message listener
+│   ├── Navbar.tsx                   # Global navigation bar
+│   ├── PhotoUpload.tsx              # Profile photo upload
+│   ├── StreamChatInterface.tsx      # Chat interface
+│   ├── SwipeableCard.tsx            # Swipeable card wrapper
+│   └── VideoCall.tsx                # Video call interface
+│
+├── contexts/
+│   └── auth-contexts.tsx            # Auth state management
+│
+├── lib/
+│   ├── actions/                     # Server actions
+│   │   ├── blocks.ts                # Block/unblock actions
+│   │   ├── matches.ts               # Match actions
+│   │   ├── profile.ts               # Profile actions
+│   │   └── stream.ts                # Stream Chat/Video actions
+│   ├── helpers/
+│   │   └── calculate-age.ts         # Age calculation utilities
+│   ├── supabase/
+│   │   ├── admin.ts                 # Admin client (service role)
+│   │   ├── client.ts                # Browser client (anon key)
+│   │   └── server.ts                # Server client (cookies)
+│   ├── utils/
+│   │   └── error-handler.ts         # Error handling utilities
+│   └── profile-utils.ts             # Profile mapping utilities
+│
+├── public/                          # Static assets
+│   ├── marahuyo.png                # App logo
+│   └── default-avatar.svg          # Default profile picture
+│
+├── docs/                            # Documentation
+│   └── DATABASE_ARCHITECTURE_DIAGRAM.md  # Database schema
+│
+├── .env.local                       # Environment variables (local)
+├── package.json                     # Dependencies
+├── tsconfig.json                    # TypeScript config
+├── next.config.ts                   # Next.js config
+├── postcss.config.mjs               # PostCSS config (Tailwind)
+├── eslint.config.mjs                # ESLint config
+└── README.md                        # This file
+```
 
 ### Common Development Patterns
 
 #### Using Authentication in a Page
 
 ```typescript
-'use client';  // Required for hooks
+'use client';
 import { useAuth } from '@/contexts/auth-contexts';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -315,7 +393,6 @@ export default function ProtectedPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  // Redirect unauthenticated users
   useEffect(() => {
     if (!loading && !user) {
       router.push('/auth');
@@ -325,196 +402,135 @@ export default function ProtectedPage() {
   if (loading) return <div>Loading...</div>;
   if (!user) return null;
 
-  return (
-    <div>
-      <h1>Welcome, {user.email}</h1>
-    </div>
-  );
+  return <div>Welcome, {user.email}</div>;
 }
 ```
 
-#### Creating a New Authenticated Page
-
-1. Create `app/your-page/page.tsx`
-2. Mark as `'use client'` if using hooks
-3. Import `useAuth()` and redirect logic
-4. Use the pattern above
-
-#### Calling Supabase from a Server Component
+#### Creating a Server Action
 
 ```typescript
+'use server';
 import { createClient } from '@/lib/supabase/server';
 
-export default async function ServerComponent() {
+export async function myServerAction() {
   const supabase = await createClient();
   
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .limit(10);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: 'Not authenticated' };
+  }
 
-  return <div>{/* render data */}</div>;
+  // Your logic here
+  
+  return { success: true };
 }
 ```
 
-### Styling Best Practices
+#### Calling Stream Chat
 
-- Use **Tailwind CSS classes** for responsive layouts
-- Use **inline styles** for brand colors:
-  ```tsx
-  style={{ backgroundColor: '#583C5C' }}  // Primary
-  style={{ backgroundColor: '#E8B960' }}  // Accent
-  style={{ backgroundColor: '#F7F4F3' }}  // Background
-  ```
-- Maintain **consistency** with existing components
-- Test dark mode compatibility
+```typescript
+import { getStreamUserToken, createOrGetChannel } from '@/lib/actions/stream';
+import { StreamChat } from 'stream-chat';
 
----
+// Get token and connect
+const { token, userId, userName } = await getStreamUserToken();
+const client = StreamChat.getInstance(API_KEY);
+await client.connectUser({ id: userId, name: userName }, token);
 
-## 📁 Project Structure
-
-```
-montero-wc-dating-app/
-├── app/                          # Next.js App Router
-│   ├── layout.tsx               # Root layout with AuthProvider
-│   ├── page.tsx                 # Landing page
-│   ├── auth/
-│   │   └── page.tsx             # Auth page (sign-up/sign-in)
-│   └── globals.css              # Global styles
-│
-├── contexts/
-│   └── auth-contexts.tsx        # Auth state management
-│
-├── lib/
-│   └── supabase/
-│       ├── client.ts            # Browser client (anon key)
-│       └── server.ts            # Server client (cookies)
-│
-├── public/                       # Static assets
-│
-├── .github/
-│   └── copilot-instructions.md  # AI agent guidelines
-│
-├── .env.local                    # Environment variables (local)
-├── package.json                  # Dependencies
-├── tsconfig.json                 # TypeScript config
-├── next.config.ts                # Next.js config
-├── postcss.config.mjs            # PostCSS config (Tailwind)
-├── eslint.config.mjs             # ESLint config
-└── README.md                      # This file
+// Create/get channel
+const { channelId } = await createOrGetChannel(otherUserId);
+const channel = client.channel('messaging', channelId);
+await channel.watch();
 ```
 
 ---
 
-## ✨ Key Features
+## 📖 Documentation
 
-### Authentication
+### Code Documentation
 
-- ✅ Email/password sign-up
-- ✅ Email/password sign-in
-- ✅ Real-time session sync across tabs/windows
-- ✅ Automatic redirect for unauthenticated users
-- ✅ Secure session handling via browser storage
+All major files include comprehensive JSDoc comments explaining:
+- **Purpose and overview**
+- **Key features**
+- **Parameters and return types**
+- **Usage examples**
+- **Integration notes**
 
-### User Experience
+Documented files include:
+- All components (`components/*.tsx`)
+- All pages (`app/**/*.tsx`)
+- All server actions (`lib/actions/*.ts`)
+- All utility functions (`lib/**/*.ts`)
+- Context providers (`contexts/*.tsx`)
 
-- ✅ Responsive design (mobile-first)
-- ✅ Brand-consistent styling
-- ✅ Error messaging and validation
-- ✅ Loading states (framework ready)
-- ✅ Dark mode support (framework ready)
+### Architecture Documentation
 
-### Developer Experience
-
-- ✅ TypeScript strict mode (type safety)
-- ✅ ESLint configuration (code quality)
-- ✅ Path aliases for clean imports (`@/...`)
-- ✅ Comprehensive AI agent guidelines
-- ✅ Clear architecture documentation
+- **Database Schema**: See `docs/DATABASE_ARCHITECTURE_DIAGRAM.md`
+- **API Documentation**: Inline JSDoc comments in action files
+- **Component Props**: TypeScript interfaces with inline documentation
 
 ---
 
 ## ⚠️ Known Issues
 
-### 1. Auth Loading State Bug
+### Current Limitations
 
-**Severity**: Medium
-**File**: `contexts/auth-contexts.tsx`
-**Issue**: The `loading` state is initialized to `false` and never set to `true` during the initial auth check.
-**Impact**: Users don't see a loading skeleton when the app first loads and checks if they're logged in.
-**Fix**:
+1. **Location-based Discovery**
+   - Distance filtering is implemented but requires user location input
+   - No automatic geolocation integration yet
 
-```typescript
-useEffect(() => {
-  setLoading(true);  // ← Add this line
-  async function checkUser() {
-    // ... existing code ...
-  } finally {
-    setLoading(false);
-  }
-}, []);
-```
+2. **Profile Photos**
+   - Single photo upload only
+   - No photo gallery support yet
 
-### 2. Missing Race Condition Protection
+3. **Notifications**
+   - In-app notifications only
+   - No push notification support yet
 
-**Severity**: Low
-**File**: `app/auth/page.tsx` (when created for protected pages)
-**Issue**: Protected pages should check both `user` and `loading` state to prevent redirect race conditions.
-**Recommended**: Always use both conditions in useEffect redirects:
-
-```typescript
-useEffect(() => {
-  if (!loading && !user) {
-    router.push('/auth');
-  }
-}, [user, loading, router]);
-```
+4. **Search & Filters**
+   - Basic preference filtering only
+   - No advanced search or filter options
 
 ---
 
 ## 🗺️ Roadmap
 
-### Phase 1: Core (Current) ✅
+### Phase 1: Core Features ✅ (Complete)
+- ✅ Authentication system
+- ✅ User profiles with editing
+- ✅ Discovery/swiping interface
+- ✅ Matching system
+- ✅ Real-time messaging
+- ✅ Video calling
+- ✅ Block/unblock functionality
 
-- Authentication infrastructure
-- Landing page
-- Sign-up/sign-in flow
-- User session management
+### Phase 2: Enhanced Features (Current)
+- [ ] Photo gallery (multiple photos per user)
+- [ ] Advanced filters and search
+- [ ] User interests and tags
+- [ ] Profile verification badges
+- [ ] Report user functionality
 
-### Phase 2: Profiles (Next)
+### Phase 3: Mobile & Performance
+- [ ] Progressive Web App (PWA) support
+- [ ] Push notifications
+- [ ] Offline message queuing
+- [ ] Image optimization
+- [ ] Performance monitoring
 
-- User profile schema
-- Profile creation on sign-up
-- Photo upload and gallery
-- Profile editing interface
+### Phase 4: Social Features
+- [ ] User reviews/ratings
+- [ ] Icebreaker prompts
+- [ ] Voice messages
+- [ ] Photo reactions
+- [ ] Story feature
 
-### Phase 3: Discovery & Matching
-
-- User discovery algorithm
-- Swipe/like/pass interactions
-- Match notifications
-- Match history
-
-### Phase 4: Messaging
-
-- Real-time chat
-- Message history
-- Notifications (push + in-app)
-- Read receipts
-
-### Phase 5: Safety & Polish
-
-- Reporting system
-- Block/unblock functionality
-- Account deletion
-- Advanced moderation
-
-### Phase 6: Scale & Optimize
-
-- Performance optimization
-- Analytics integration
-- A/B testing framework
-- Subscription monetization (if applicable)
+### Phase 5: Business & Analytics
+- [ ] Subscription tiers
+- [ ] Analytics dashboard
+- [ ] A/B testing framework
+- [ ] Admin panel
+- [ ] Content moderation tools
 
 ---
 
@@ -525,48 +541,79 @@ useEffect(() => {
 - Follow TypeScript strict mode conventions
 - Use React 19 patterns (hooks, functional components)
 - Follow Tailwind CSS best practices
-- Include comments for complex logic
+- Include JSDoc comments for functions and components
+- Write self-documenting code with clear variable names
 
 ### Commit Messages
 
 Use conventional commits:
 
 ```
-feat: add password reset flow
-fix: correct auth loading state bug
-docs: update README with roadmap
-test: add auth context tests
+feat: add photo gallery feature
+fix: correct match notification timing
+docs: update README with new features
+style: apply cosmic theme to settings page
+refactor: optimize discovery algorithm
+test: add match creation tests
 chore: update dependencies
 ```
 
-### Creating Pull Requests
+### Pull Request Process
 
 1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Make your changes
+2. Make your changes with clear commits
 3. Test locally: `npm run dev` and `npm run lint`
-4. Commit with descriptive messages
+4. Update documentation if needed
 5. Push to your branch: `git push origin feature/your-feature`
-6. Open a pull request with a clear description
+6. Open a pull request with:
+   - Clear description of changes
+   - Screenshots for UI changes
+   - Testing steps
+   - Related issue numbers
 
-### Testing Before Commit
+### Testing Checklist
 
-```bash
-# Check for linting errors
-npm run lint
-
-# Run dev server and test manually
-npm run dev
-```
+- [ ] Code runs without errors
+- [ ] ESLint passes (`npm run lint`)
+- [ ] Manual testing completed
+- [ ] No console errors in browser
+- [ ] Responsive design verified
+- [ ] Dark mode compatible (if applicable)
 
 ---
 
-## 📞 Support & Questions
+## 🎉 Getting Help
 
-For questions about the codebase architecture, refer to:
+### Debugging Tips
 
-- **AI Agent Guidelines**: `.github/copilot-instructions.md`
-- **Code Comments**: Inline documentation in key files
-- **This README**: For architecture overview
+1. **Authentication issues?**
+   - Check browser DevTools → Application → Cookies
+   - Verify `.env.local` has correct Supabase credentials
+   - Check Supabase dashboard for auth logs
+
+2. **Chat not working?**
+   - Verify Stream API credentials in `.env.local`
+   - Check browser console for Stream connection errors
+   - Ensure users are matched before accessing chat
+
+3. **Styles not applying?**
+   - Clear `.next` folder: `rm -rf .next`
+   - Restart dev server
+   - Check Tailwind config
+
+4. **TypeScript errors?**
+   - Run `npm run lint` to see all errors
+   - Check `tsconfig.json` for strict mode settings
+   - Ensure all dependencies are installed
+
+### Common Error Messages
+
+| Error | Solution |
+|-------|----------|
+| "User not authenticated" | Sign in again, check session |
+| "Match not found" | Users must mutually like each other |
+| "Failed to upload photo" | Check file size (max 5MB) and format |
+| "Stream connection failed" | Verify Stream API credentials |
 
 ---
 
@@ -578,39 +625,23 @@ This project is proprietary software developed for Whitecloak/Montero. All right
 
 ## 👥 Team
 
-- **Project**: Hearts Dating App
+- **Project**: Marahuyo Dating App
 - **Organization**: Montero (Whitecloak)
-- **Repository**: montero_whitecloak_builder_round
+- **Repository**: montero-wc-dating-app
 - **Owner**: montero-dev011024
 
 ---
 
-## 🎉 Getting Help
+## 🌟 Acknowledgments
 
-### Debugging Tips
-
-1. **Auth not persisting after page refresh?**
-
-   - Check browser DevTools → Application → Cookies
-   - Verify `.env.local` has correct Supabase URL and keys
-2. **User stuck on auth page?**
-
-   - Check browser console for errors
-   - Verify Supabase project is running
-   - Check Network tab for failed requests
-3. **Styles not applying?**
-
-   - Clear `.next` folder: `rm -r .next`
-   - Restart dev server
-   - Verify Tailwind config in `tailwind.config.ts`
-4. **TypeScript errors?**
-
-   - Ensure you have TypeScript 5+ installed
-   - Run `npm run lint` to see all errors
-   - Check `tsconfig.json` for strict mode settings
+Special thanks to:
+- **Supabase** for database and authentication infrastructure
+- **Stream** for chat and video calling capabilities
+- **Next.js** team for the excellent framework
+- **Tailwind CSS** for the utility-first styling approach
 
 ---
 
-**Last Updated**: October 28, 2025
-**Version**: 0.1.0 (Alpha)
-**Status**: Active Development
+**Last Updated**: October 30, 2025  
+**Version**: 1.0.0 (Production Ready)  
+**Status**: Feature Complete - Ready for Testing
