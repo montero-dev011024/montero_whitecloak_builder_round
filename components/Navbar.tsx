@@ -151,6 +151,14 @@ export default function Navbar() {
                                         >
                                             👤 View Profile
                                         </Link>
+                                        <Link
+                                            href="/block"
+                                            className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                                            style={{ color: "#3D3538" }}
+                                            onClick={() => setIsDropdownOpen(false)}
+                                        >
+                                            🚫 Blocked Users
+                                        </Link>
                                         <button
                                             onClick={handleSignOut}
                                             className="w-full text-left px-4 py-2 text-sm border-t border-gray-200 transition-colors"

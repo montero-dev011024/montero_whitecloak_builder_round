@@ -1,191 +1,156 @@
-    "use server";
+"use server";
 
-    import { UserPreferences, UserProfile } from "@/app/profile/page";
-    import { createClient } from "../supabase/server";
+import type { UserPreferences, UserProfile } from "@/app/profile/page";
+import { mapUserRowToProfile, userWithProfileSelect } from "@/lib/profile-utils";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "../supabase/server";
 
-    const userWithProfileSelect = `
-    id,
-    full_name,
-    email,
-    gender,
-    birthdate,
-    bio,
-    preferences,
-    location_lat,
-    location_lng,
-    is_online,
-    last_active_at,
-    verified_at,
-    created_at,
-    updated_at,
-    profiles (
-        profile_picture_url,
-        profile_picture_uploaded_at,
-        height_cm,
-        education,
-        occupation,
-        relationship_goal,
-        smoking,
-        drinking,
-        children
-    )
-    `;
+const MATCH_LIMIT = 50;
 
-    const mapUserRowToProfile = (userRow: any): UserProfile => {
-    const profileDetailsRaw = userRow?.profiles;
-    const profileDetails = Array.isArray(profileDetailsRaw)
-    ? profileDetailsRaw[0]
-    : profileDetailsRaw;
+type LikeResponse =
+    | { success: true; isMatch: false }
+    | { success: true; isMatch: true; matchedUser: UserProfile };
 
-    const parseDecimal = (value: unknown) => {
-    if (typeof value === "number") {
-        return value;
+const collectBlockedUserIds = async (
+    supabase: SupabaseClient,
+    userId: string
+): Promise<Set<string>> => {
+    const { data: relations, error } = await supabase
+        .from("blocks")
+        .select("blocker_id, blocked_id")
+        .or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`);
+
+    if (error) {
+        throw new Error("Failed to resolve block relationships");
     }
 
-    if (typeof value === "string" && value.trim() !== "") {
-        const parsed = Number(value);
-        return Number.isFinite(parsed) ? parsed : null;
+    const blocked = new Set<string>();
+
+    for (const relation of relations ?? []) {
+        if (relation.blocker_id === userId) {
+            blocked.add(relation.blocked_id);
+        }
+        if (relation.blocked_id === userId) {
+            blocked.add(relation.blocker_id);
+        }
     }
 
-    return null;
-    };
+    return blocked;
+};
 
-    return {
-    id: userRow.id,
-    full_name: userRow.full_name,
-    email: userRow.email,
-    gender: userRow.gender,
-    birthdate: userRow.birthdate,
-    bio: userRow.bio ?? "",
-    profile_picture_url: profileDetails?.profile_picture_url ?? null,
-    profile_picture_uploaded_at:
-        profileDetails?.profile_picture_uploaded_at ?? null,
-    preferences: (userRow.preferences ?? {
-        age_range: { min: 18, max: 50 },
-        distance_miles: 25,
-        gender_preferences: [],
-        relationship_goal: "not_sure",
-    }) as UserPreferences,
-    location_lat: parseDecimal(userRow.location_lat),
-    location_lng: parseDecimal(userRow.location_lng),
-    is_online: Boolean(userRow.is_online),
-    last_active_at: userRow.last_active_at ?? null,
-    verified_at: userRow.verified_at ?? null,
-    created_at: userRow.created_at ?? new Date().toISOString(),
-    updated_at: userRow.updated_at ?? new Date().toISOString(),
-    height_cm: profileDetails?.height_cm ?? null,
-    education: profileDetails?.education ?? null,
-    occupation: profileDetails?.occupation ?? null,
-    relationship_goal: profileDetails?.relationship_goal ?? null,
-    smoking: profileDetails?.smoking ?? null,
-    drinking: profileDetails?.drinking ?? null,
-    children: profileDetails?.children ?? null,
-    };
-    };
-
-    export async function getPotentialMatches(): Promise<UserProfile[]> {
+const getCurrentUser = async () => {
     const supabase = await createClient();
     const {
-    data: { user },
+        data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-    throw new Error("Not authenticated.");
+        throw new Error("Not authenticated.");
     }
 
-    // Does not include the current user
-    // Limited to 50 for scalability 
+    return { supabase, userId: user.id } as const;
+};
+
+export async function getPotentialMatches(): Promise<UserProfile[]> {
+    const { supabase, userId } = await getCurrentUser();
+
+    const blockedUserIds = await collectBlockedUserIds(supabase, userId);
+
     const { data: potentialMatches, error } = await supabase
-    .from("users")
-    .select(userWithProfileSelect)
-    .neq("id", user.id)
-    .limit(50);
+        .from("users")
+        .select(userWithProfileSelect)
+        .neq("id", userId)
+        .limit(MATCH_LIMIT);
 
     if (error) {
-    throw new Error("failed to fetch potential matches");
+        throw new Error("Failed to fetch potential matches");
     }
 
     const { data: userPrefs, error: prefsError } = await supabase
-    .from("users")
-    .select("preferences")
-    .eq("id", user.id)
-    .single();
+        .from("users")
+        .select("preferences")
+        .eq("id", userId)
+        .single();
 
     if (prefsError) {
-    throw new Error("Failed to get user preferences");
+        throw new Error("Failed to get user preferences");
     }
 
     const currentUserPrefs = (userPrefs.preferences ?? null) as
-    | UserPreferences
-    | null;
+        | UserPreferences
+        | null;
     const genderPreferences = currentUserPrefs?.gender_preferences ?? [];
 
-    const filteredMatches = (potentialMatches ?? [])
-    .filter((match) => {
-        if (!genderPreferences.length) {
-        return true;
-        }
-
-        return genderPreferences.includes(match.gender);
-    })
-    .map(mapUserRowToProfile);
-
-    return filteredMatches;
-    }
-
-    export async function likeUser(toUserId: string) {
-    const supabase = await createClient();
-    const {
-    data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-    throw new Error("Not authenticated.");
-    }
-
-        const { error: likeError } = await supabase
-            .from("likes")
-            .insert({
-                from_user_id: user.id,
-                to_user_id: toUserId,
-            });
-
-        if (likeError) {
-            if (likeError.code === "23505") {
-                const { error: reactivateError } = await supabase
-                    .from("likes")
-                    .update({
-                        is_active: true,
-                        unliked_at: null,
-                    })
-                    .eq("from_user_id", user.id)
-                    .eq("to_user_id", toUserId);
-
-                if (reactivateError) {
-                    throw new Error("Failed to reactivate like");
-                }
-            } else {
-                throw new Error("Failed to create like");
+    return (potentialMatches ?? [])
+        .filter((match) => !blockedUserIds.has(match.id))
+        .filter((match) => {
+            if (!genderPreferences.length) {
+                return true;
             }
+
+            return genderPreferences.includes(match.gender);
+        })
+        .map((match) => mapUserRowToProfile(match));
+}
+
+export async function likeUser(toUserId: string): Promise<LikeResponse> {
+    const { supabase, userId } = await getCurrentUser();
+
+    if (userId === toUserId) {
+        throw new Error("You cannot like yourself.");
+    }
+
+    const blocked = await collectBlockedUserIds(supabase, userId);
+
+    if (blocked.has(toUserId)) {
+        throw new Error("Cannot like a user you have blocked or who has blocked you.");
+    }
+
+    const { error: likeError } = await supabase.from("likes").insert({
+        from_user_id: userId,
+        to_user_id: toUserId,
+    });
+
+    if (likeError) {
+        if (likeError.code === "23505") {
+            const { error: reactivateError } = await supabase
+                .from("likes")
+                .update({
+                    is_active: true,
+                    unliked_at: null,
+                })
+                .eq("from_user_id", userId)
+                .eq("to_user_id", toUserId);
+
+            if (reactivateError) {
+                throw new Error("Failed to reactivate like");
+            }
+        } else {
+            throw new Error("Failed to create like");
         }
+    }
 
     const { data: existingLike, error: checkError } = await supabase
-    .from("likes")
-    .select("*")
-    .eq("from_user_id", toUserId)
-    .eq("to_user_id", user.id)
-    .single();
+        .from("likes")
+        .select("*")
+        .eq("from_user_id", toUserId)
+        .eq("to_user_id", userId)
+        .eq("is_active", true)
+        .maybeSingle();
 
     if (checkError && checkError.code !== "PGRST116") {
-    throw new Error("Failed to check for match");
+        throw new Error("Failed to check for match");
     }
 
-    if (existingLike) {
+    if (!existingLike) {
+        return { success: true, isMatch: false };
+    }
+
     const { data: matchedUser, error: userError } = await supabase
         .from("users")
         .select(userWithProfileSelect)
         .eq("id", toUserId)
-        .single();
+        .maybeSingle();
 
     if (userError || !matchedUser) {
         throw new Error("Failed to fetch matched user");
@@ -196,49 +161,44 @@
         isMatch: true,
         matchedUser: mapUserRowToProfile(matchedUser),
     };
-    }
+}
 
-    return { success: true, isMatch: false };
-    }
+export async function getUserMatches(): Promise<UserProfile[]> {
+    const { supabase, userId } = await getCurrentUser();
 
-    export async function getUserMatches() {
-    const supabase = await createClient();
-    const {
-    data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-    throw new Error("Not authenticated.");
-    }
+    const blockedUserIds = await collectBlockedUserIds(supabase, userId);
 
     const { data: matches, error } = await supabase
-    .from("matches")
-    .select("*")
-    .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-    .eq("is_active", true);
+        .from("matches")
+        .select("*")
+        .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+        .eq("is_active", true);
 
     if (error) {
-    throw new Error("Failed to fetch matches");
+        throw new Error("Failed to fetch matches");
     }
 
-    const matchedUsers: UserProfile[] = [];
+    const matchedProfiles: UserProfile[] = [];
 
-    for (const match of matches || []) {
-    const otherUserId =
-        match.user1_id === user.id ? match.user2_id : match.user1_id;
+    for (const match of matches ?? []) {
+        const otherUserId = match.user1_id === userId ? match.user2_id : match.user1_id;
 
-    const { data: otherUser, error: userError } = await supabase
-        .from("users")
-        .select(userWithProfileSelect)
-        .eq("id", otherUserId)
-        .single();
+        if (blockedUserIds.has(otherUserId)) {
+            continue;
+        }
 
-    if (userError || !otherUser) {
-        continue;
+        const { data: otherUser, error: userError } = await supabase
+            .from("users")
+            .select(userWithProfileSelect)
+            .eq("id", otherUserId)
+            .maybeSingle();
+
+        if (userError || !otherUser) {
+            continue;
+        }
+
+        matchedProfiles.push(mapUserRowToProfile(otherUser));
     }
 
-    matchedUsers.push(mapUserRowToProfile(otherUser));
-    }
-
-    return matchedUsers;
-    }
+    return matchedProfiles;
+}

@@ -2,35 +2,126 @@
 
 import { UserProfile } from "@/app/profile/page";
 import { getUserMatches } from "@/lib/actions/matches";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import type { MouseEvent } from "react";
+import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import Link from "next/link";
 import { calculateAge } from "@/lib/helpers/calculate-age";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { blockUser, unmatchUser } from "@/lib/actions/blocks";
+import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/auth-contexts";
 
 const DEFAULT_AVATAR = "/default-avatar.svg";
 
+type MatchRow = {
+    id: string;
+    user1_id: string;
+    user2_id: string;
+    is_active: boolean;
+};
+
 export default function MatchesListPage() {
     const router = useRouter();
+    const { user } = useAuth();
     const [matches, setMatches] = useState<UserProfile[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [feedback, setFeedback] = useState<string | null>(null);
+    const [actionError, setActionError] = useState<string | null>(null);
+    const [isPending, startTransition] = useTransition();
+
+    const refreshMatches = useCallback(() => {
+        startTransition(() => {
+            getUserMatches()
+                .then((latest) => {
+                    setMatches(latest);
+                })
+                .catch((err) => {
+                    console.error("Failed to refresh matches", err);
+                });
+        });
+    }, [startTransition]);
 
     useEffect(() => {
+        let isMounted = true;
+
         async function loadMatches() {
             try {
                 const userMatches = await getUserMatches();
-                setMatches(userMatches);
+                if (isMounted) {
+                    setMatches(userMatches);
+                }
             } catch (err) {
                 console.error("Failed to load matches:", err);
-                setError("Failed to load matches.");
+                if (isMounted) {
+                    setError("Failed to load matches.");
+                }
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         }
 
         loadMatches();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
+
+    useEffect(() => {
+        if (!user) {
+            return () => {};
+        }
+
+        const supabase = createClient();
+        const channel = supabase
+            .channel(`matches-list-${user.id}`)
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "matches" },
+                (payload: RealtimePostgresChangesPayload<MatchRow>) => {
+                    const record = (payload.new ?? payload.old) as MatchRow | null;
+
+                    if (!record) {
+                        return;
+                    }
+
+                    if (record.user1_id !== user.id && record.user2_id !== user.id) {
+                        return;
+                    }
+
+                    const otherUserId = record.user1_id === user.id ? record.user2_id : record.user1_id;
+
+                    if (payload.eventType === "DELETE") {
+                        setMatches((prev) => prev.filter((match) => match.id !== otherUserId));
+                        return;
+                    }
+
+                    if (payload.eventType === "UPDATE") {
+                        if (!payload.new?.is_active) {
+                            setMatches((prev) => prev.filter((match) => match.id !== otherUserId));
+                            return;
+                        }
+
+                        refreshMatches();
+                        return;
+                    }
+
+                    if (payload.eventType === "INSERT" && payload.new?.is_active) {
+                        refreshMatches();
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [user?.id, refreshMatches]);
 
     if (loading) {
         return (
@@ -104,6 +195,18 @@ export default function MatchesListPage() {
                     </div>
                 </header>
 
+                {feedback && (
+                    <div className="max-w-2xl mx-auto mb-6 rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-medium text-emerald-800 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200">
+                        {feedback}
+                    </div>
+                )}
+
+                {actionError && (
+                    <div className="max-w-2xl mx-auto mb-6 rounded-xl border border-red-200 bg-red-50/80 px-4 py-3 text-sm font-medium text-red-800 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
+                        {actionError}
+                    </div>
+                )}
+
                 {matches.length === 0 ? (
                     <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg">
                         <div className="w-24 h-24 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -128,11 +231,73 @@ export default function MatchesListPage() {
                             {matches.map((match) => {
                                 const avatarSrc = match.profile_picture_url || DEFAULT_AVATAR;
 
+                                const handleOpenChat = () => router.push(`/chat/${match.id}`);
+
+                                const handleUnmatch = (event: MouseEvent<HTMLButtonElement>) => {
+                                    event.stopPropagation();
+
+                                    const confirmed = window.confirm(
+                                        `Unmatch ${match.full_name}? This will remove your chat history.`
+                                    );
+
+                                    if (!confirmed) {
+                                        return;
+                                    }
+
+                                    setFeedback(null);
+                                    setActionError(null);
+
+                                    startTransition(async () => {
+                                        try {
+                                            await unmatchUser(match.id);
+                                            setMatches((previous) => previous.filter((item) => item.id !== match.id));
+                                            setFeedback(`${match.full_name} has been unmatched.`);
+                                        } catch (err) {
+                                            console.error("Failed to unmatch user", err);
+                                            setActionError("Unable to unmatch right now. Please try again later.");
+                                        }
+                                    });
+                                };
+
+                                const handleBlock = (event: MouseEvent<HTMLButtonElement>) => {
+                                    event.stopPropagation();
+
+                                    const confirmed = window.confirm(
+                                        `Block ${match.full_name}? They will not see you in Discover and cannot message you.`
+                                    );
+
+                                    if (!confirmed) {
+                                        return;
+                                    }
+
+                                    setFeedback(null);
+                                    setActionError(null);
+
+                                    startTransition(async () => {
+                                        try {
+                                            await blockUser(match.id);
+                                            setMatches((previous) => previous.filter((item) => item.id !== match.id));
+                                            setFeedback(`${match.full_name} has been blocked.`);
+                                        } catch (err) {
+                                            console.error("Failed to block user", err);
+                                            setActionError("Unable to block this user right now. Please try again later.");
+                                        }
+                                    });
+                                };
+
                                 return (
-                                    <Link
+                                    <div
                                         key={match.id}
-                                        href={`/chat/${match.id}`}
-                                        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={handleOpenChat}
+                                        onKeyDown={(event) => {
+                                            if (event.key === "Enter" || event.key === " ") {
+                                                event.preventDefault();
+                                                handleOpenChat();
+                                            }
+                                        }}
+                                        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-400/60 hover:scale-[1.02]"
                                     >
                                         <div className="flex items-center space-x-4">
                                             <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0 bg-gray-200 dark:bg-gray-700">
@@ -159,28 +324,35 @@ export default function MatchesListPage() {
                                                 </p>
                                             </div>
 
-                                            <div className="flex-shrink-0 flex flex-col items-center space-y-2">
+                                            <div className="flex-shrink-0 flex items-center space-x-3">
                                                 {match.is_online ? (
                                                     <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" title="Online now" />
                                                 ) : (
                                                     <div className="w-3 h-3 bg-gray-300 dark:bg-gray-600 rounded-full" title="Offline" />
                                                 )}
-                                                <svg
-                                                    className="w-5 h-5 text-gray-400"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
+                                                <button
+                                                    onClick={handleUnmatch}
+                                                    disabled={isPending}
+                                                    className="p-2 rounded-full border border-gray-200 text-gray-500 transition-colors hover:border-pink-300 hover:text-pink-600 disabled:opacity-60 dark:border-gray-600 dark:text-gray-300 dark:hover:border-pink-300"
+                                                    title="Unmatch"
                                                 >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M9 5l7 7-7 7"
-                                                    />
-                                                </svg>
+                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                                <button
+                                                    onClick={handleBlock}
+                                                    disabled={isPending}
+                                                    className="p-2 rounded-full border border-gray-200 text-gray-500 transition-colors hover:border-red-300 hover:text-red-600 disabled:opacity-60 dark:border-gray-600 dark:text-gray-300 dark:hover:border-red-300"
+                                                    title="Block user"
+                                                >
+                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11a2 2 0 012 2v3a2 2 0 01-4 0v-3a2 2 0 012-2zm6 0V9a6 6 0 10-12 0v2H5a2 2 0 00-2 2v6a2 2 0 002 2h14a2 2 0 002-2v-6a2 2 0 00-2-2h-1zM9 11V9a3 3 0 116 0v2" />
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
-                                    </Link>
+                                    </div>
                                 );
                             })}
                         </div>
