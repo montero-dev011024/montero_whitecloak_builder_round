@@ -112,19 +112,18 @@ export default function AuthPage() {
     }
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background" style={{ background: "var(--gradient-cosmic)" }}>
             {/* Animated stars background */}
             <div className="absolute inset-0">
                 {stars.map((star, i) => (
                     <div
                         key={i}
-                        className="absolute w-1 h-1 rounded-full animate-pulse"
+                        className="absolute w-1 h-1 rounded-full animate-pulse bg-foreground"
                         style={{
                             left: `${star.left}%`,
                             top: `${star.top}%`,
                             animationDelay: `${star.delay}s`,
                             opacity: star.opacity,
-                            backgroundColor: "hsl(45 100% 95%)",
                         }}
                     />
                 ))}
@@ -133,17 +132,12 @@ export default function AuthPage() {
             {/* Back to Home Link */}
             <Link
                 href="/"
-                className="absolute top-8 left-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group"
-                style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                }}
+                className="absolute top-8 left-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group bg-card/50 backdrop-blur-md border border-border"
             >
-                <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "hsl(45 90% 55%)" }}>
+                <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                <span style={{ color: "hsl(45 90% 55%)" }} className="font-medium">Back to Home</span>
+                <span className="font-medium text-primary">Back to Home</span>
             </Link>
 
             {/* Main auth content */}
@@ -162,29 +156,26 @@ export default function AuthPage() {
                             }}
                         />
                     </div>
-                    <h1 className="text-4xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
+                    <h1 className="text-4xl font-bold mb-2 text-primary">
                         {isSignUp ? "Join Marahuyo" : "Welcome Back"}
                     </h1>
-                    <p className="text-lg" style={{ color: "hsl(220 10% 65%)" }}>
+                    <p className="text-lg text-muted-foreground">
                         {isSignUp ? "Begin your cosmic journey" : "Continue your journey"}
                     </p>
                 </div>
 
                 {/* Auth Form Card */}
                 <div 
-                    className="rounded-2xl shadow-2xl p-8 backdrop-blur-md"
+                    className="rounded-2xl shadow-2xl p-8 backdrop-blur-md bg-card/50 border border-border"
                     style={{
-                        backgroundColor: "rgba(255, 255, 255, 0.05)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)",
-                        boxShadow: "0 0 60px hsl(45 90% 55% / 0.1)",
+                        boxShadow: "var(--shadow-glow-warm)",
                     }}
                 >
                     <form className="space-y-6" onSubmit={handleAuth}>
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-sm font-medium mb-2"
-                                style={{ color: "hsl(45 90% 55%)" }}
+                                className="block text-sm font-medium mb-2 text-primary"
                             >
                                 Email Address
                             </label>
@@ -194,13 +185,7 @@ export default function AuthPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                                style={{ 
-                                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                                    color: "hsl(220 10% 95%)",
-                                    backdropFilter: "blur(10px)",
-                                }}
+                                className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all bg-input border border-border text-foreground backdrop-blur-md"
                                 placeholder="your@email.com"
                             />
                         </div>
@@ -208,8 +193,7 @@ export default function AuthPage() {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium mb-2"
-                                style={{ color: "hsl(45 90% 55%)" }}
+                                className="block text-sm font-medium mb-2 text-primary"
                             >
                                 Password
                             </label>
@@ -219,25 +203,14 @@ export default function AuthPage() {
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                                style={{ 
-                                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                                    color: "hsl(220 10% 95%)",
-                                    backdropFilter: "blur(10px)",
-                                }}
+                                className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all bg-input border border-border text-foreground backdrop-blur-md"
                                 placeholder="Enter your password"
                             />
                         </div>
 
                         {error && (
                             <div 
-                                className="text-sm p-4 rounded-lg"
-                                style={{ 
-                                    backgroundColor: "rgba(230, 57, 70, 0.1)",
-                                    border: "1px solid rgba(230, 57, 70, 0.3)",
-                                    color: "hsl(0 70% 70%)",
-                                }}
+                                className="text-sm p-4 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive"
                             >
                                 {error}
                             </div>
@@ -246,25 +219,23 @@ export default function AuthPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-4 px-4 rounded-full font-semibold text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg"
+                            className="w-full py-4 px-4 rounded-full font-semibold text-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg text-primary-foreground"
                             style={{
-                                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
-                                color: "hsl(220 30% 8%)",
-                                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)",
+                                background: "var(--gradient-warm)",
+                                boxShadow: "var(--shadow-glow-warm)",
                             }}
                         >
                             {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
                         </button>
                     </form>
 
-                    <div className="text-center mt-6 pt-6" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                    <div className="text-center mt-6 pt-6 border-t border-border">
                         <button
                             onClick={() => {
                                 setIsSignUp(!isSignUp);
                                 setError("");
                             }}
-                            className="text-sm hover:opacity-80 transition-opacity"
-                            style={{ color: "hsl(200 60% 50%)" }}
+                            className="text-sm hover:opacity-80 transition-opacity text-secondary"
                         >
                             {isSignUp
                                 ? "Already have an account? Sign in"
@@ -275,7 +246,7 @@ export default function AuthPage() {
             </div>
 
             {/* Bottom gradient fade */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none" style={{ background: "linear-gradient(to top, hsl(220 30% 8%), transparent)" }} />
+            <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none bg-gradient-to-t from-background to-transparent" />
         </section>
     );
 }

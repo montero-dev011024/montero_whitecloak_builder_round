@@ -115,10 +115,10 @@ export default function ChatPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+      <div className="min-h-screen flex items-center justify-center bg-background" style={{ background: "var(--gradient-cosmic)" }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
-          <p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">
             Loading your matches...
           </p>
         </div>
@@ -127,35 +127,34 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+    <div className="min-h-screen bg-background" style={{ background: "var(--gradient-cosmic)" }}>
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
+          <h1 className="text-3xl font-bold mb-2 text-primary">
             Messages
           </h1>
-          <p style={{ color: "hsl(220 10% 65%)" }}>
+          <p className="text-muted-foreground">
             {chats.length} conversation{chats.length !== 1 ? "s" : ""}
           </p>
         </header>
 
         {chats.length === 0 ? (
           <div className="text-center max-w-md mx-auto p-8">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "var(--gradient-warm)" }}>
               <span className="text-4xl">💬</span>
             </div>
-            <h2 className="text-2xl font-bold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
+            <h2 className="text-2xl font-bold mb-4 text-primary">
               No conversations yet
             </h2>
-            <p className="mb-6" style={{ color: "hsl(220 10% 65%)" }}>
+            <p className="mb-6 text-muted-foreground">
               Start swiping to find matches and begin conversations!
             </p>
             <Link
               href="/discover"
-              className="inline-block font-semibold py-3 px-6 rounded-full transition-all duration-200"
+              className="inline-block font-semibold py-3 px-6 rounded-full transition-all duration-200 text-primary-foreground"
               style={{
-                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
-                color: "hsl(220 30% 8%)",
-                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+                background: "var(--gradient-warm)",
+                boxShadow: "var(--shadow-glow-warm)"
               }}
             >
               Start Swiping
@@ -163,22 +162,22 @@ export default function ChatPage() {
           </div>
         ) : (
           <div className="max-w-2xl mx-auto">
-            <div className="rounded-2xl shadow-lg overflow-hidden backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+            <div className="rounded-2xl shadow-lg overflow-hidden backdrop-blur-md bg-card/50 border border-border">
               {chats.map((chat, key) => (
                 <Link
                   key={key}
                   href={`/chat/${chat.id}`}
                   className="block hover:bg-white/10 transition-colors duration-200"
                 >
-                  <div className="flex items-center p-6 border-b last:border-b-0" style={{ borderColor: "rgba(255, 255, 255, 0.1)" }}>
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
+                  <div className="flex items-center p-6 border-b last:border-b-0 border-border">
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0" style={{ boxShadow: "var(--shadow-glow-warm)" }}>
                       <img
                         src={chat.user.profile_picture_url || "/default-avatar.png"}
                         alt={chat.user.full_name}
                         className="w-full h-full object-cover"
                       />
                       {chat.unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold" style={{ backgroundColor: "hsl(0 70% 60%)" }}>
+                        <div className="absolute -top-1 -right-1 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold bg-destructive">
                           {chat.unreadCount}
                         </div>
                       )}
@@ -186,15 +185,15 @@ export default function ChatPage() {
 
                     <div className="flex-1 min-w-0 ml-4">
                       <div className="flex items-center justify-between mb-1">
-                        <h3 className="text-lg font-semibold truncate" style={{ color: "hsl(45 90% 55%)" }}>
+                        <h3 className="text-lg font-semibold truncate text-primary">
                           {chat.user.full_name}
                         </h3>
-                        <span className="text-sm flex-shrink-0" style={{ color: "hsl(220 10% 60%)" }}>
+                        <span className="text-sm flex-shrink-0 text-muted-foreground">
                           {formatTime(chat.lastMessageTime)}
                         </span>
                       </div>
 
-                      <p className="text-sm truncate" style={{ color: "hsl(220 10% 65%)" }}>
+                      <p className="text-sm truncate text-muted-foreground">
                         {chat.lastMessage}
                       </p>
                     </div>

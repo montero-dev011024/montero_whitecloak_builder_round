@@ -141,10 +141,10 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+      <div className="min-h-screen flex items-center justify-center bg-background" style={{ background: "var(--gradient-cosmic)" }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
-          <p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">
             Loading your profile...
           </p>
         </div>
@@ -154,24 +154,23 @@ export default function ProfilePage() {
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+      <div className="min-h-screen flex items-center justify-center bg-background" style={{ background: "var(--gradient-cosmic)" }}>
         <div className="text-center max-w-md mx-auto p-8">
-          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
+          <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "var(--gradient-warm)" }}>
             <span className="text-4xl">❌</span>
           </div>
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
+          <h2 className="text-2xl font-bold mb-4 text-primary">
             Profile not found
           </h2>
-          <p className="mb-6" style={{ color: "hsl(220 10% 65%)" }}>
+          <p className="mb-6 text-muted-foreground">
             {error || "Unable to load your profile. Please try again."}
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="font-semibold py-3 px-6 rounded-full transition-all duration-200"
+            className="font-semibold py-3 px-6 rounded-full transition-all duration-200 text-primary-foreground"
             style={{
-              background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
-              color: "hsl(220 30% 8%)",
-              boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+              background: "var(--gradient-warm)",
+              boxShadow: "var(--shadow-glow-warm)"
             }}
           >
             Retry
@@ -182,13 +181,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+    <div className="min-h-screen bg-background" style={{ background: "var(--gradient-cosmic)" }}>
       <div className="container mx-auto px-4 py-8">
         <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
+          <h1 className="text-3xl font-bold mb-2 text-primary">
             My Profile
           </h1>
-          <p style={{ color: "hsl(220 10% 65%)" }}>
+          <p className="text-muted-foreground">
             Manage your profile and preferences
           </p>
         </header>
@@ -196,10 +195,10 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <div className="rounded-2xl shadow-lg p-8 backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+              <div className="rounded-2xl shadow-lg p-8 backdrop-blur-md bg-card/50 border border-border">
                 <div className="flex items-center space-x-6 mb-8">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full overflow-hidden" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
+                    <div className="w-24 h-24 rounded-full overflow-hidden" style={{ boxShadow: "var(--shadow-glow-warm)" }}>
                       <img
                         src={profile.profile_picture_url || "/default-avatar.svg"}
                         alt={profile.full_name}
@@ -209,13 +208,13 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold mb-1" style={{ color: "hsl(45 90% 55%)" }}>
+                    <h2 className="text-2xl font-bold mb-1 text-primary">
                       {profile.full_name}, {calculateAge(profile.birthdate)}
                     </h2>
-                    <p className="mb-2" style={{ color: "hsl(220 10% 65%)" }}>
+                    <p className="mb-2 text-muted-foreground">
                       {profile.email}
                     </p>
-                    <p className="text-sm" style={{ color: "hsl(220 10% 60%)" }}>
+                    <p className="text-sm text-muted-foreground">
                       Member since{" "}
                       {new Date(profile.created_at).toLocaleDateString()}
                     </p>
@@ -224,32 +223,32 @@ export default function ProfilePage() {
 
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold mb-3" style={{ color: "hsl(45 90% 55%)" }}>
+                    <h3 className="text-lg font-semibold mb-3 text-primary">
                       About Me
                     </h3>
-                    <p className="leading-relaxed" style={{ color: "hsl(220 10% 70%)" }}>
+                    <p className="leading-relaxed text-muted-foreground">
                       {profile.bio || "No bio added yet."}
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold mb-3" style={{ color: "hsl(45 90% 55%)" }}>
+                    <h3 className="text-lg font-semibold mb-3 text-primary">
                       Basic Information
                     </h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                        <label className="block text-sm font-medium mb-1 text-muted-foreground">
                           Gender
                         </label>
-                        <p className="capitalize" style={{ color: "hsl(220 10% 95%)" }}>
+                        <p className="capitalize text-foreground">
                           {profile.gender.replace(/_/g, " ")}
                         </p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                        <label className="block text-sm font-medium mb-1 text-muted-foreground">
                           Birthday
                         </label>
-                        <p style={{ color: "hsl(220 10% 95%)" }}>
+                        <p className="text-foreground">
                           {new Date(profile.birthdate).toLocaleDateString()}
                         </p>
                       </div>
@@ -260,76 +259,76 @@ export default function ProfilePage() {
                   {(profile.height_cm || profile.education || profile.occupation || 
                     profile.smoking !== null || profile.drinking !== null || profile.children) && (
                     <div>
-                      <h3 className="text-lg font-semibold mb-3" style={{ color: "hsl(45 90% 55%)" }}>
+                      <h3 className="text-lg font-semibold mb-3 text-primary">
                         Additional Details
                       </h3>
                       <div className="grid grid-cols-2 gap-4">
                         {profile.height_cm && (
                           <div>
-                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                            <label className="block text-sm font-medium mb-1 text-muted-foreground">
                               📏 Height
                             </label>
-                            <p style={{ color: "hsl(220 10% 95%)" }}>
+                            <p className="text-foreground">
                               {profile.height_cm} cm
                             </p>
                           </div>
                         )}
                         {profile.relationship_goal && (
                           <div>
-                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                            <label className="block text-sm font-medium mb-1 text-muted-foreground">
                               💕 Looking for
                             </label>
-                            <p className="capitalize" style={{ color: "hsl(220 10% 95%)" }}>
+                            <p className="capitalize text-foreground">
                               {profile.relationship_goal.replace(/_/g, " ")}
                             </p>
                           </div>
                         )}
                         {profile.education && (
                           <div>
-                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                            <label className="block text-sm font-medium mb-1 text-muted-foreground">
                               🎓 Education
                             </label>
-                            <p style={{ color: "hsl(220 10% 95%)" }}>
+                            <p className="text-foreground">
                               {profile.education}
                             </p>
                           </div>
                         )}
                         {profile.occupation && (
                           <div>
-                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                            <label className="block text-sm font-medium mb-1 text-muted-foreground">
                               💼 Occupation
                             </label>
-                            <p style={{ color: "hsl(220 10% 95%)" }}>
+                            <p className="text-foreground">
                               {profile.occupation}
                             </p>
                           </div>
                         )}
                         {profile.smoking !== null && (
                           <div>
-                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                            <label className="block text-sm font-medium mb-1 text-muted-foreground">
                               🚬 Smoking
                             </label>
-                            <p style={{ color: "hsl(220 10% 95%)" }}>
+                            <p className="text-foreground">
                               {profile.smoking ? "Yes" : "No"}
                             </p>
                           </div>
                         )}
                         {profile.drinking !== null && (
                           <div>
-                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                            <label className="block text-sm font-medium mb-1 text-muted-foreground">
                               🍷 Drinking
                             </label>
-                            <p style={{ color: "hsl(220 10% 95%)" }}>
+                            <p className="text-foreground">
                               {profile.drinking ? "Yes" : "No"}
                             </p>
                           </div>
                         )}
                         {profile.children && (
                           <div>
-                            <label className="block text-sm font-medium mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                            <label className="block text-sm font-medium mb-1 text-muted-foreground">
                               👶 Children
                             </label>
-                            <p className="capitalize" style={{ color: "hsl(220 10% 95%)" }}>
+                            <p className="capitalize text-foreground">
                               {profile.children.replace(/_/g, " ")}
                             </p>
                           </div>
@@ -343,8 +342,8 @@ export default function ProfilePage() {
             </div>
 
             <div className="space-y-6">
-              <div className="rounded-2xl shadow-lg p-6 backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
+              <div className="rounded-2xl shadow-lg p-6 backdrop-blur-md bg-card/50 border border-border">
+                <h3 className="text-lg font-semibold mb-4 text-primary">
                   Quick Actions
                 </h3>
                 <div className="space-y-3">
@@ -353,13 +352,12 @@ export default function ProfilePage() {
                     className="flex items-center justify-between p-3 rounded-lg hover:bg-white/10 transition-colors duration-200"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-primary-foreground" style={{ background: "var(--gradient-warm)" }}>
                         <svg
                           className="w-4 h-4"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
-                          style={{ color: "hsl(220 30% 8%)" }}
                         >
                           <path
                             strokeLinecap="round"
@@ -369,16 +367,15 @@ export default function ProfilePage() {
                           />
                         </svg>
                       </div>
-                      <span style={{ color: "hsl(220 10% 95%)" }}>
+                      <span className="text-foreground">
                         Edit Profile
                       </span>
                     </div>
                     <svg
-                      className="w-5 h-5"
+                      className="w-5 h-5 text-muted-foreground"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
-                      style={{ color: "hsl(220 10% 60%)" }}
                     >
                       <path
                         strokeLinecap="round"
@@ -391,16 +388,16 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl shadow-lg p-6 backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
+              <div className="rounded-2xl shadow-lg p-6 backdrop-blur-md bg-card/50 border border-border">
+                <h3 className="text-lg font-semibold mb-4 text-primary">
                   Account
                 </h3>
                 <div className="space-y-3">
-                  <div className="flex flex-col p-3 rounded-lg" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}>
-                    <span className="text-sm font-medium mb-2" style={{ color: "hsl(220 10% 65%)" }}>
+                  <div className="flex flex-col p-3 rounded-lg bg-card/50">
+                    <span className="text-sm font-medium mb-2 text-muted-foreground">
                       Email
                     </span>
-                    <span className="break-all text-sm" style={{ color: "hsl(220 10% 95%)" }}>
+                    <span className="break-all text-sm text-foreground">
                       {profile.email}
                     </span>
                   </div>

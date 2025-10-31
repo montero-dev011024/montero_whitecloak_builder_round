@@ -58,19 +58,18 @@ export default function Home() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background" style={{ background: "var(--gradient-cosmic)" }}>
       {/* Animated stars background */}
       <div className="absolute inset-0">
         {stars.map((star, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 rounded-full animate-pulse"
+            className="absolute w-1 h-1 rounded-full animate-pulse bg-foreground"
             style={{
               left: `${star.left}%`,
               top: `${star.top}%`,
               animationDelay: `${star.delay}s`,
               opacity: star.opacity,
-              backgroundColor: "hsl(45 100% 95%)",
             }}
           />
         ))}
@@ -95,12 +94,12 @@ export default function Home() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight" style={{ color: "hsl(45 90% 55%)" }}>
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-primary">
             Where Hearts Find Their Cosmic Connection
           </h1>
 
           {/* Subheadline */}
-          <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto" style={{ color: "hsl(220 10% 65%)" }}>
+          <p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto text-muted-foreground">
             Experience the magic of destiny-driven dating. Let the stars guide you to your perfect match.
           </p>
 
@@ -108,11 +107,10 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link
               href="/auth"
-              className="flex items-center justify-center gap-2 px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 group"
+              className="flex items-center justify-center gap-2 px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 group bg-primary text-primary-foreground"
               style={{
-                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
-                color: "hsl(220 30% 8%)",
-                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)",
+                background: "var(--gradient-warm)",
+                boxShadow: "var(--shadow-glow-warm)",
               }}
             >
               <svg className="h-5 w-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
@@ -124,28 +122,28 @@ export default function Home() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12 border-t" style={{ borderColor: "hsl(220 20% 20%)" }}>
+          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12 border-t border-border">
             <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
+              <div className="text-3xl md:text-4xl font-bold mb-2 text-primary">
                 10K+
               </div>
-              <div className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
+              <div className="text-sm text-muted-foreground">
                 Enchanted Souls
               </div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "hsl(200 60% 50%)" }}>
+              <div className="text-3xl md:text-4xl font-bold mb-2 text-secondary">
                 5K+
               </div>
-              <div className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
+              <div className="text-sm text-muted-foreground">
                 Cosmic Matches
               </div>
             </div>
             <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "hsl(340 80% 65%)" }}>
+              <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "hsl(var(--romantic))" }}>
                 98%
               </div>
-              <div className="text-sm" style={{ color: "hsl(220 10% 65%)" }}>
+              <div className="text-sm text-muted-foreground">
                 Success Rate
               </div>
             </div>
@@ -154,7 +152,7 @@ export default function Home() {
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32" style={{ background: "linear-gradient(to top, hsl(220 30% 8%), transparent)" }} />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 }

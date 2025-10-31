@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-contexts";
+import { ThemeProvider } from "@/contexts/theme-context";
 import Navbar from "@/components/Navbar";
 import MessageNotificationListener from "@/components/MessageNotificationListener";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -27,18 +28,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="luna">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ErrorBoundary>
-          <AuthProvider>
-            <div className="min-h-screen font-sans">
-              <Navbar />
-              <MessageNotificationListener />
-              {children}
-            </div>
-          </AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <div className="min-h-screen font-sans">
+                <Navbar />
+                <MessageNotificationListener />
+                {children}
+              </div>
+            </AuthProvider>
+          </ThemeProvider>
         </ErrorBoundary>
       </body>
     </html>

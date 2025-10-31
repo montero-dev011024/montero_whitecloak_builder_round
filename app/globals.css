@@ -1,5 +1,36 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
 :root {
   /* Cosmic color palette inspired by the Marahuyo logo */
   --background: 220 30% 8%;
@@ -55,6 +86,92 @@
   --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
+/* Luna Theme - Dark cosmic theme (default) */
+.luna {
+  --background: 220 30% 8%;
+  --foreground: 45 100% 95%;
+
+  --card: 220 28% 12%;
+  --card-foreground: 45 100% 95%;
+
+  --popover: 220 28% 12%;
+  --popover-foreground: 45 100% 95%;
+
+  --primary: 45 90% 55%;
+  --primary-foreground: 220 30% 8%;
+
+  --secondary: 200 60% 50%;
+  --secondary-foreground: 220 30% 8%;
+
+  --muted: 220 20% 20%;
+  --muted-foreground: 220 10% 65%;
+
+  --accent: 270 60% 60%;
+  --accent-foreground: 45 100% 95%;
+
+  --romantic: 340 80% 65%;
+  --romantic-foreground: 220 30% 8%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 45 100% 95%;
+
+  --border: 220 20% 20%;
+  --input: 220 20% 20%;
+  --ring: 45 90% 55%;
+
+  --gradient-cosmic: linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%));
+  --gradient-warm: linear-gradient(135deg, hsl(25 85% 55%), hsl(45 90% 55%));
+  --gradient-cool: linear-gradient(135deg, hsl(200 60% 50%), hsl(270 60% 60%));
+  --gradient-hero: linear-gradient(180deg, hsl(220 30% 8% / 0.95), hsl(270 40% 15% / 0.98));
+
+  --shadow-glow-warm: 0 0 40px hsl(45 90% 55% / 0.3);
+  --shadow-glow-cool: 0 0 40px hsl(200 60% 50% / 0.3);
+  --shadow-glow-accent: 0 0 30px hsl(270 60% 60% / 0.4);
+}
+
+/* Sol Theme - Light celestial theme */
+.sol {
+  --background: 45 100% 98%;
+  --foreground: 220 30% 15%;
+
+  --card: 45 60% 95%;
+  --card-foreground: 220 30% 15%;
+
+  --popover: 45 60% 95%;
+  --popover-foreground: 220 30% 15%;
+
+  --primary: 45 90% 50%;
+  --primary-foreground: 45 100% 98%;
+
+  --secondary: 200 60% 60%;
+  --secondary-foreground: 45 100% 98%;
+
+  --muted: 45 20% 90%;
+  --muted-foreground: 220 10% 40%;
+
+  --accent: 270 60% 70%;
+  --accent-foreground: 45 100% 98%;
+
+  --romantic: 340 80% 70%;
+  --romantic-foreground: 45 100% 98%;
+
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 45 100% 98%;
+
+  --border: 45 30% 85%;
+  --input: 45 30% 85%;
+  --ring: 45 90% 50%;
+
+  --gradient-cosmic: linear-gradient(135deg, hsl(45 100% 98%), hsl(200 60% 95%), hsl(270 40% 95%));
+  --gradient-warm: linear-gradient(135deg, hsl(25 90% 60%), hsl(45 95% 60%));
+  --gradient-cool: linear-gradient(135deg, hsl(200 70% 65%), hsl(270 70% 75%));
+  --gradient-hero: linear-gradient(180deg, hsl(45 100% 98% / 0.95), hsl(200 50% 97% / 0.98));
+
+  --shadow-glow-warm: 0 0 30px hsl(45 90% 50% / 0.2);
+  --shadow-glow-cool: 0 0 30px hsl(200 60% 60% / 0.2);
+  --shadow-glow-accent: 0 0 25px hsl(270 60% 70% / 0.3);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: 220 30% 8%;
@@ -66,6 +183,7 @@ body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 @layer components {

@@ -201,22 +201,21 @@ export default function MatchesListPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+            <div className="min-h-screen flex items-center justify-center bg-background" style={{ background: "var(--gradient-cosmic)" }}>
                 <div className="text-center max-w-md mx-auto p-8">
-                    <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
+                    <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "var(--gradient-warm)" }}>
                         <span className="text-4xl">❌</span>
                     </div>
-                    <h2 className="text-2xl font-bold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
+                    <h2 className="text-2xl font-bold mb-4 text-primary">
                         Oops! Something went wrong
                     </h2>
-                    <p className="mb-6" style={{ color: "hsl(220 10% 65%)" }}>{error}</p>
+                    <p className="mb-6 text-muted-foreground">{error}</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="font-semibold py-3 px-6 rounded-full transition-all duration-200"
+                        className="font-semibold py-3 px-6 rounded-full transition-all duration-200 text-primary-foreground"
                         style={{
-                            background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
-                            color: "hsl(220 30% 8%)",
-                            boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+                            background: "var(--gradient-warm)",
+                            boxShadow: "var(--shadow-glow-warm)"
                         }}
                     >
                         Try Again
@@ -227,52 +226,51 @@ export default function MatchesListPage() {
     }
 
     return (
-        <div className="min-h-screen" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
+        <div className="min-h-screen bg-background" style={{ background: "var(--gradient-cosmic)" }}>
             <div className="container mx-auto px-4 py-8">
                 <header className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                     </div>
 
                     <div className="text-center">
-                        <h1 className="text-3xl font-bold mb-2" style={{ color: "hsl(45 90% 55%)" }}>
+                        <h1 className="text-3xl font-bold mb-2 text-primary">
                             Your Matches
                         </h1>
-                        <p style={{ color: "hsl(220 10% 65%)" }}>
+                        <p className="text-muted-foreground">
                             {matches.length} match{matches.length !== 1 ? "es" : ""}
                         </p>
                     </div>
                 </header>
 
                 {feedback && (
-                    <div className="max-w-2xl mx-auto mb-6 rounded-xl border px-4 py-3 text-sm font-medium" style={{ borderColor: "rgba(16, 185, 129, 0.3)", backgroundColor: "rgba(16, 185, 129, 0.1)", color: "hsl(160 70% 70%)" }}>
+                    <div className="max-w-2xl mx-auto mb-6 rounded-xl border px-4 py-3 text-sm font-medium bg-secondary/10 border-secondary/30 text-secondary">
                         {feedback}
                     </div>
                 )}
 
                 {actionError && (
-                    <div className="max-w-2xl mx-auto mb-6 rounded-xl border px-4 py-3 text-sm font-medium" style={{ borderColor: "rgba(230, 57, 70, 0.3)", backgroundColor: "rgba(230, 57, 70, 0.1)", color: "hsl(0 70% 70%)" }}>
+                    <div className="max-w-2xl mx-auto mb-6 rounded-xl border px-4 py-3 text-sm font-medium bg-destructive/10 border-destructive/30 text-destructive">
                         {actionError}
                     </div>
                 )}
 
                 {matches.length === 0 ? (
-                    <div className="text-center max-w-md mx-auto p-8 rounded-2xl shadow-lg backdrop-blur-md" style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
-                        <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))" }}>
+                    <div className="text-center max-w-md mx-auto p-8 rounded-2xl shadow-lg backdrop-blur-md bg-card/50 border border-border">
+                        <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "var(--gradient-warm)" }}>
                             <span className="text-4xl">💕</span>
                         </div>
-                        <h2 className="text-2xl font-bold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
+                        <h2 className="text-2xl font-bold mb-4 text-primary">
                             No matches yet
                         </h2>
-                        <p className="mb-6" style={{ color: "hsl(220 10% 65%)" }}>
+                        <p className="mb-6 text-muted-foreground">
                             Start swiping to find your perfect match!
                         </p>
                         <Link
                             href="/discover"
-                            className="inline-block font-semibold py-3 px-6 rounded-full transition-all duration-200"
+                            className="inline-block font-semibold py-3 px-6 rounded-full transition-all duration-200 text-primary-foreground"
                             style={{
-                                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
-                                color: "hsl(220 30% 8%)",
-                                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
+                                background: "var(--gradient-warm)",
+                                boxShadow: "var(--shadow-glow-warm)"
                             }}
                         >
                             Start Swiping
@@ -350,15 +348,13 @@ export default function MatchesListPage() {
                                                 handleOpenChat();
                                             }
                                         }}
-                                        className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none hover:scale-[1.02] backdrop-blur-md"
+                                        className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none hover:scale-[1.02] backdrop-blur-md bg-card/50 border border-border"
                                         style={{ 
-                                            backgroundColor: "rgba(255, 255, 255, 0.05)", 
-                                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                                            boxShadow: "0 0 20px hsl(45 90% 55% / 0.1)"
+                                            boxShadow: "var(--shadow-glow-warm)"
                                         }}
                                     >
                                         <div className="flex items-center space-x-4">
-                                            <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
+                                            <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0" style={{ boxShadow: "var(--shadow-glow-warm)" }}>
                                                 <Image
                                                     src={avatarSrc}
                                                     alt={match.full_name}
@@ -369,30 +365,29 @@ export default function MatchesListPage() {
                                             </div>
 
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="text-lg font-semibold truncate" style={{ color: "hsl(45 90% 55%)" }}>
+                                                <h3 className="text-lg font-semibold truncate text-primary">
                                                     {match.full_name}, {calculateAge(match.birthdate)}
                                                 </h3>
                                                 {match.occupation && (
-                                                    <p className="text-sm mb-1" style={{ color: "hsl(220 10% 65%)" }}>
+                                                    <p className="text-sm mb-1 text-muted-foreground">
                                                         {match.occupation}
                                                     </p>
                                                 )}
-                                                <p className="text-sm line-clamp-2" style={{ color: "hsl(220 10% 70%)" }}>
+                                                <p className="text-sm line-clamp-2 text-muted-foreground">
                                                     {match.bio || "No bio available"}
                                                 </p>
                                             </div>
 
                                             <div className="flex-shrink-0 flex items-center space-x-3">
                                                 {match.is_online ? (
-                                                    <div className="w-3 h-3 rounded-full animate-pulse" style={{ backgroundColor: "hsl(160 70% 50%)" }} title="Online now" />
+                                                    <div className="w-3 h-3 rounded-full animate-pulse bg-secondary" title="Online now" />
                                                 ) : (
-                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} title="Offline" />
+                                                    <div className="w-3 h-3 rounded-full bg-border" title="Offline" />
                                                 )}
                                                 <button
                                                     onClick={handleUnmatch}
                                                     disabled={isPending}
-                                                    className="p-2 rounded-full border transition-colors hover:bg-white/10 disabled:opacity-60"
-                                                    style={{ borderColor: "rgba(255, 255, 255, 0.2)", color: "hsl(220 10% 70%)" }}
+                                                    className="p-2 rounded-full border border-border transition-colors hover:bg-white/10 disabled:opacity-60 text-muted-foreground"
                                                     title="Unmatch"
                                                 >
                                                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,8 +397,7 @@ export default function MatchesListPage() {
                                                 <button
                                                     onClick={handleBlock}
                                                     disabled={isPending}
-                                                    className="p-2 rounded-full border transition-colors hover:bg-white/10 disabled:opacity-60"
-                                                    style={{ borderColor: "rgba(230, 57, 70, 0.5)", color: "hsl(0 70% 60%)" }}
+                                                    className="p-2 rounded-full border border-destructive/50 transition-colors hover:bg-white/10 disabled:opacity-60 text-destructive"
                                                     title="Block user"
                                                 >
                                                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
