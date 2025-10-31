@@ -77,7 +77,7 @@ import {
 } from "@/lib/actions/profile";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 export default function EditProfilePage() {
     const [loading, setLoading] = useState(true);
@@ -137,6 +137,67 @@ children: string;
         return date.toISOString().split("T")[0];
     }, []);
     const hasLocation = location.lat !== null && location.lng !== null;
+
+    const cardStyles: CSSProperties = {
+        background: "linear-gradient(140deg, rgba(19, 17, 35, 0.85), rgba(16, 24, 39, 0.9))",
+        border: "1px solid rgba(232, 185, 96, 0.25)",
+        boxShadow: "0 25px 50px -15px hsla(230, 60%, 5%, 0.9)",
+    };
+
+    const labelStyles: CSSProperties = {
+        color: "hsl(45 90% 72%)",
+        letterSpacing: "0.02em",
+        fontWeight: 600,
+    };
+
+    const helperTextStyles: CSSProperties = {
+        color: "hsl(220 15% 70%)",
+    };
+
+    const sectionTitleStyles: CSSProperties = {
+        ...labelStyles,
+        fontSize: "1.25rem",
+        fontWeight: 700,
+    };
+
+    const inputStyles: CSSProperties = {
+        background: "linear-gradient(135deg, rgba(28, 22, 44, 0.85), rgba(13, 19, 33, 0.9))",
+        border: "1px solid rgba(232, 185, 96, 0.25)",
+        color: "hsl(45 90% 90%)",
+        boxShadow: "0 0 25px hsla(220, 40%, 10%, 0.35)",
+    };
+
+    const textareaStyles: CSSProperties = {
+        ...inputStyles,
+        minHeight: "120px",
+    };
+
+    const selectStyles: CSSProperties = {
+        ...inputStyles,
+    };
+
+    const optionStyles: CSSProperties = {
+        backgroundColor: "hsl(230 35% 14%)",
+        color: "hsl(45 90% 85%)",
+    };
+
+    const primaryButtonStyles: CSSProperties = {
+        background: "linear-gradient(135deg, hsl(45 90% 60%), hsl(25 90% 55%))",
+        color: "hsl(222 50% 10%)",
+        boxShadow: "0 0 35px hsla(45, 90%, 60%, 0.35)",
+    };
+
+    const ghostButtonStyles: CSSProperties = {
+        background: "rgba(13, 19, 33, 0.6)",
+        border: "1px solid rgba(232, 185, 96, 0.25)",
+        color: "hsl(220 15% 75%)",
+    };
+
+    const successAccentStyles: CSSProperties = {
+        color: "hsl(150 60% 65%)",
+    };
+
+    const dividerColor = "rgba(232, 185, 96, 0.25)";
  
     useEffect(() => {
         async function loadProfile() {
@@ -427,7 +488,7 @@ setProfileDetails((prev) => {
     <div className="max-w-2xl mx-auto">
         <form
         className="rounded-2xl shadow-lg p-8 backdrop-blur-md"
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}
+        style={cardStyles}
         onSubmit={handleFormSubmit}
         >
         <div className="mb-8 flex flex-col items-center gap-6 md:flex-row md:items-start">
@@ -449,7 +510,7 @@ setProfileDetails((prev) => {
                 <label
                 htmlFor="full_name"
                 className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
+                style={labelStyles}
                 >
                 Full Name *
                 </label>
@@ -461,11 +522,7 @@ setProfileDetails((prev) => {
                 required
                 maxLength={150}
                 className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
+                style={inputStyles}
                 placeholder="Your full name"
                 />
             </div>
@@ -475,7 +532,7 @@ setProfileDetails((prev) => {
                 <label
                     htmlFor="birthdate"
                     className="block text-sm font-medium mb-2"
-                    style={{ color: "hsl(45 90% 55%)" }}
+                    style={labelStyles}
                 >
                     Birthdate *
                 </label>
@@ -488,13 +545,9 @@ setProfileDetails((prev) => {
                     required
                     max={maxBirthdate}
                     className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                    style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                    }}
+                    style={inputStyles}
                 />
-                <p className="text-xs mt-1" style={{ color: "hsl(220 10% 60%)" }}>
+                <p className="text-xs mt-1" style={helperTextStyles}>
                     You must be at least 18 years old.
                 </p>
                 </div>
@@ -503,7 +556,7 @@ setProfileDetails((prev) => {
                 <label
                     htmlFor="email"
                     className="block text-sm font-medium mb-2"
-                    style={{ color: "hsl(45 90% 55%)" }}
+                    style={labelStyles}
                 >
                     Email
                 </label>
@@ -514,16 +567,16 @@ setProfileDetails((prev) => {
                     disabled
                     className="w-full px-4 py-2 rounded-lg cursor-not-allowed"
                     style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
-                    border: "1px solid rgba(255, 255, 255, 0.15)",
-                    color: "hsl(220 10% 65%)"
+                    ...inputStyles,
+                    opacity: 0.6,
+                    color: "hsl(220 15% 70%)",
                     }}
                 />
                 </div>
             </div>
 
             {photoUploadSuccess && (
-                <p className="text-xs" style={{ color: "hsl(150 60% 60%)" }}>
+                <p className="text-xs" style={successAccentStyles}>
                 {photoUploadSuccess}
                 </p>
             )}
@@ -531,10 +584,10 @@ setProfileDetails((prev) => {
         </div>
 
         <div className="mb-8">
-            <label className="block text-sm font-medium mb-3" style={{ color: "hsl(45 90% 55%)" }}>
+            <label className="block text-sm font-medium mb-3" style={labelStyles}>
             📍 Location for Discovery
             </label>
-            <p className="text-xs" style={{ color: "hsl(220 10% 65%)" }}>
+            <p className="text-xs" style={helperTextStyles}>
             We use your saved coordinates to surface matches within your preferred distance.
             </p>
             <div className="flex flex-wrap items-center gap-3 mt-4">
@@ -544,8 +597,7 @@ setProfileDetails((prev) => {
                 disabled={isLocating}
                 className="px-4 py-2 rounded-lg font-medium transition-colors"
                 style={{
-                backgroundColor: "hsl(45 90% 55%)",
-                color: "hsl(222 47% 11%)",
+                ...primaryButtonStyles,
                 opacity: isLocating ? 0.7 : 1,
                 }}
             >
@@ -556,17 +608,13 @@ setProfileDetails((prev) => {
                 type="button"
                 onClick={handleClearLocation}
                 className="px-4 py-2 rounded-lg font-medium transition-colors"
-                style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.08)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 80%)",
-                }}
+                style={ghostButtonStyles}
                 >
                 Clear Location
                 </button>
             )}
             </div>
-            <div className="mt-3 text-sm" style={{ color: "hsl(220 10% 70%)" }}>
+            <div className="mt-3 text-sm" style={helperTextStyles}>
             <p>
                 Saved coordinates: {hasLocation ? `${location.lat?.toFixed(5)}, ${location.lng?.toFixed(5)}` : "Not yet set"}
             </p>
@@ -582,7 +630,7 @@ setProfileDetails((prev) => {
             <label
             htmlFor="bio"
             className="block text-sm font-medium mb-2"
-            style={{ color: "hsl(45 90% 55%)" }}
+            style={labelStyles}
             >
             About Me *
             </label>
@@ -595,21 +643,17 @@ setProfileDetails((prev) => {
             rows={4}
             maxLength={500}
             className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all resize-none"
-            style={{ 
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                color: "hsl(220 10% 95%)"
-            }}
+            style={textareaStyles}
             placeholder="Tell others about yourself..."
             />
-            <p className="text-xs mt-1" style={{ color: "hsl(220 10% 60%)" }}>
+            <p className="text-xs mt-1" style={helperTextStyles}>
             {formData.bio.length}/500 characters
             </p>
         </div>
 
         {/* Profile Details Section */}
-        <div className="mb-6 pt-6 border-t" style={{ borderColor: "rgba(232, 185, 96, 0.2)" }}>
-            <h2 className="text-xl font-semibold mb-4" style={{ color: "hsl(45 90% 55%)" }}>
+        <div className="mb-6 pt-6 border-t" style={{ borderColor: dividerColor }}>
+            <h2 className="text-xl font-semibold mb-4" style={sectionTitleStyles}>
             Additional Details
             </h2>
             
@@ -618,7 +662,7 @@ setProfileDetails((prev) => {
                 <label
                 htmlFor="height_cm"
                 className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
+                style={labelStyles}
                 >
                 📏 Height (cm)
                 </label>
@@ -631,11 +675,7 @@ setProfileDetails((prev) => {
                 min="0"
                 max="300"
                 className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
+                style={inputStyles}
                 placeholder="e.g., 170"
                 />
             </div>
@@ -644,7 +684,7 @@ setProfileDetails((prev) => {
                 <label
                 htmlFor="relationship_goal"
                 className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
+                style={labelStyles}
                 >
                 💕 Relationship Goal
                 </label>
@@ -654,16 +694,12 @@ setProfileDetails((prev) => {
                 value={profileDetails.relationship_goal}
                 onChange={handleProfileDetailsChange}
                 className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
+                style={selectStyles}
                 >
-                <option value="not_sure">Not sure</option>
-                <option value="something_casual">Something casual</option>
-                <option value="something_serious">Something serious</option>
-                <option value="just_exploring">Just exploring</option>
+                <option value="not_sure" style={optionStyles}>Not sure</option>
+                <option value="something_casual" style={optionStyles}>Something casual</option>
+                <option value="something_serious" style={optionStyles}>Something serious</option>
+                <option value="just_exploring" style={optionStyles}>Just exploring</option>
                 </select>
             </div>
             </div>
@@ -673,7 +709,7 @@ setProfileDetails((prev) => {
                 <label
                 htmlFor="education"
                 className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
+                style={labelStyles}
                 >
                 🎓 Education
                 </label>
@@ -684,11 +720,7 @@ setProfileDetails((prev) => {
                 value={profileDetails.education}
                 onChange={handleProfileDetailsChange}
                 className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
+                style={inputStyles}
                 placeholder="e.g., Bachelor's Degree"
                 />
             </div>
@@ -697,7 +729,7 @@ setProfileDetails((prev) => {
                 <label
                 htmlFor="occupation"
                 className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
+                style={labelStyles}
                 >
                 💼 Occupation
                 </label>
@@ -708,11 +740,7 @@ setProfileDetails((prev) => {
                 value={profileDetails.occupation}
                 onChange={handleProfileDetailsChange}
                 className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
+                style={inputStyles}
                 placeholder="e.g., Software Engineer"
                 />
             </div>
@@ -723,7 +751,7 @@ setProfileDetails((prev) => {
                 <label
                 htmlFor="smoking"
                 className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
+                style={labelStyles}
                 >
                 🚬 Smoking
                 </label>
@@ -733,15 +761,11 @@ setProfileDetails((prev) => {
                 value={profileDetails.smoking === null ? "" : profileDetails.smoking.toString()}
                 onChange={handleProfileDetailsChange}
                 className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
+                style={selectStyles}
                 >
-                <option value="">Prefer not to say</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option value="" style={optionStyles}>Prefer not to say</option>
+                <option value="true" style={optionStyles}>Yes</option>
+                <option value="false" style={optionStyles}>No</option>
                 </select>
             </div>
 
@@ -749,7 +773,7 @@ setProfileDetails((prev) => {
                 <label
                 htmlFor="drinking"
                 className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
+                style={labelStyles}
                 >
                 🍷 Drinking
                 </label>
@@ -759,15 +783,11 @@ setProfileDetails((prev) => {
                 value={profileDetails.drinking === null ? "" : profileDetails.drinking.toString()}
                 onChange={handleProfileDetailsChange}
                 className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
+                style={selectStyles}
                 >
-                <option value="">Prefer not to say</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option value="" style={optionStyles}>Prefer not to say</option>
+                <option value="true" style={optionStyles}>Yes</option>
+                <option value="false" style={optionStyles}>No</option>
                 </select>
             </div>
 
@@ -775,7 +795,7 @@ setProfileDetails((prev) => {
                 <label
                 htmlFor="children"
                 className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
+                style={labelStyles}
                 >
                 👶 Children
                 </label>
@@ -785,17 +805,13 @@ setProfileDetails((prev) => {
                 value={profileDetails.children}
                 onChange={handleProfileDetailsChange}
                 className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
+                style={selectStyles}
                 >
-                <option value="">Prefer not to say</option>
-                <option value="none">None</option>
-                <option value="want_someday">Want someday</option>
-                <option value="have_kids">Have kids</option>
-                <option value="dont_want">Don't want</option>
+                <option value="" style={optionStyles}>Prefer not to say</option>
+                <option value="none" style={optionStyles}>None</option>
+                <option value="want_someday" style={optionStyles}>Want someday</option>
+                <option value="have_kids" style={optionStyles}>Have kids</option>
+                <option value="dont_want" style={optionStyles}>Don't want</option>
                 </select>
             </div>
             </div>
@@ -807,12 +823,12 @@ setProfileDetails((prev) => {
             </div>
         )}
 
-        <div className="flex items-center justify-between pt-6 border-t" style={{ borderColor: "rgba(232, 185, 96, 0.2)" }}>
+        <div className="flex items-center justify-between pt-6 border-t" style={{ borderColor: dividerColor }}>
             <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-2 transition-colors duration-200"
-            style={{ color: "hsl(220 10% 70%)" }}
+            className="px-6 py-2 rounded-lg font-medium transition-colors duration-200"
+            style={ghostButtonStyles}
             >
             Cancel
             </button>
@@ -820,11 +836,7 @@ setProfileDetails((prev) => {
             type="submit"
             disabled={saving}
             className="px-6 py-2 font-semibold rounded-lg focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-            style={{
-                background: "linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))",
-                color: "hsl(220 30% 8%)",
-                boxShadow: "0 0 40px hsl(45 90% 55% / 0.3)"
-            }}
+            style={primaryButtonStyles}
             >
             {saving ? "Saving..." : "Save Changes"}
             </button>
