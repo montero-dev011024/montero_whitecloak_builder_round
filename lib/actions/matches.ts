@@ -113,7 +113,8 @@ export async function getPotentialMatches(): Promise<UserProfile[]> {
     const { data: existingLikes, error: likesError } = await supabase
         .from("likes")
         .select("to_user_id")
-        .eq("from_user_id", userId);
+        .eq("from_user_id", userId)
+        .eq("is_active", true);
 
     if (likesError) {
         throw new Error("Failed to fetch existing interactions");

@@ -415,6 +415,7 @@ setProfileDetails((prev) => {
             profile_picture_url: url,
         }));
         setPhotoUploadSuccess("Profile photo updated successfully.");
+        router.refresh();
     }
 
     async function handleUseCurrentLocation() {
