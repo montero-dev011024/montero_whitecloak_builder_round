@@ -90,7 +90,7 @@ export default function ChatConversationPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: "hsl(45 90% 55%)" }}></div>
           <p className="mt-4" style={{ color: "hsl(220 10% 65%)" }}>
-            Loading your matches...
+            Loading...
           </p>
         </div>
       </div>
