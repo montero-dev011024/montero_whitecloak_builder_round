@@ -37,7 +37,7 @@
 import { useAuth } from "@/contexts/auth-contexts";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -55,12 +55,21 @@ export default function AuthPage() {
     const [isSignUp, setIsSignUp] = useState<boolean>(false);
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [fullName, setFullName] = useState<string>("");
+    const [birthdate, setBirthdate] = useState<string>("");
+    const [bio, setBio] = useState<string>("");
+    const [profilePicture, setProfilePicture] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const [stars, setStars] = useState<Star[]>([]);
     const supabase = createClient();
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
+    const maxBirthdate = useMemo(() => {
+        const date = new Date();
+        date.setFullYear(date.getFullYear() - 18);
+        return date.toISOString().split("T")[0];
+    }, []);
     
     useEffect(() => {
         // Generate stars only on client side to avoid hydration mismatch
@@ -79,19 +88,136 @@ export default function AuthPage() {
         }
     }, [user, authLoading, router]);
 
+    useEffect(() => {
+        if (!isSignUp) {
+            setFullName("");
+            setBirthdate("");
+            setBio("");
+            setProfilePicture(null);
+        }
+    }, [isSignUp]);
+
+    function validateBirthdate(value: string) {
+        if (!value) {
+            setError("Birthdate is required.");
+            return false;
+        }
+
+        const parsedDate = new Date(value);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            setError("Please provide a valid birthdate.");
+            return false;
+        }
+
+        const today = new Date();
+        const eighteenYearsAgo = new Date(
+            today.getFullYear() - 18,
+            today.getMonth(),
+            today.getDate()
+        );
+
+        if (parsedDate > eighteenYearsAgo) {
+            setError("You must be at least 18 years old to sign up.");
+            return false;
+        }
+
+        return true;
+    }
+
+    function handleProfilePictureChange(event: ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0];
+
+        if (!file) {
+            setProfilePicture(null);
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            setError("Profile picture must be an image file.");
+            event.target.value = "";
+            setProfilePicture(null);
+            return;
+        }
+
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+        if (file.size > MAX_FILE_SIZE) {
+            setError("Profile picture must be smaller than 5MB.");
+            event.target.value = "";
+            setProfilePicture(null);
+            return;
+        }
+
+        setError("");
+        setProfilePicture(file);
+    }
+
     // FUNCTION TO HANDLE AUTHENTICATION
-    async function handleAuth(e: React.FormEvent) {
+    async function handleAuth(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
         setError("");
 
         try {
             if (isSignUp) {
-                const {data, error} = await supabase.auth.signUp({
+                const sanitizedFullName = fullName.trim();
+
+                if (!sanitizedFullName) {
+                    setError("Full name is required.");
+                    return;
+                }
+
+                const sanitizedBio = bio.trim();
+
+                if (!sanitizedBio) {
+                    setError("Bio is required.");
+                    return;
+                }
+
+                if (!validateBirthdate(birthdate)) {
+                    return;
+                }
+
+                const { data, error: signUpError } = await supabase.auth.signUp({
                     email,
                     password,
+                    options: {
+                        data: {
+                            full_name: sanitizedFullName,
+                            birthdate,
+                            bio: sanitizedBio,
+                        },
+                    },
                 }); 
-                if (error) throw error;
+                if (signUpError) throw signUpError;
+
+                if (!data.user) {
+                    throw new Error("Unable to complete sign up. Please try again.");
+                }
+
+                const formData = new FormData();
+                formData.append("userId", data.user.id);
+                formData.append("fullName", sanitizedFullName);
+                formData.append("birthdate", birthdate);
+                formData.append("bio", sanitizedBio);
+
+                if (profilePicture) {
+                    formData.append("profilePicture", profilePicture);
+                }
+
+                const response = await fetch("/api/auth/complete-signup", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const completionResult = await response.json().catch(() => null);
+
+                if (!response.ok || !completionResult?.success) {
+                    const message = completionResult?.error ?? "Failed to save profile information.";
+                    throw new Error(message);
+                }
+
                 // user has not confirmed email
                 if (data.user && !data.session) {
                     setError("Please check your email to confirm your account.");
@@ -172,6 +298,98 @@ export default function AuthPage() {
                     }}
                 >
                     <form className="space-y-6" onSubmit={handleAuth}>
+                        {isSignUp && (
+                            <div className="space-y-6">
+                                <div>
+                                    <label
+                                        htmlFor="fullName"
+                                        className="block text-sm font-medium mb-2 text-primary"
+                                    >
+                                        Full Name
+                                    </label>
+                                    <input
+                                        id="fullName"
+                                        type="text"
+                                        required
+                                        value={fullName}
+                                        onChange={(event) => setFullName(event.target.value)}
+                                        disabled={loading}
+                                        className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all bg-input border border-border text-foreground backdrop-blur-md"
+                                        placeholder="Jane Doe"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label
+                                        htmlFor="birthdate"
+                                        className="block text-sm font-medium mb-2 text-primary"
+                                    >
+                                        Birthdate
+                                    </label>
+                                    <input
+                                        id="birthdate"
+                                        type="date"
+                                        required
+                                        max={maxBirthdate}
+                                        value={birthdate}
+                                        onChange={(event) => setBirthdate(event.target.value)}
+                                        disabled={loading}
+                                        className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all bg-input border border-border text-foreground backdrop-blur-md"
+                                    />
+                                    <p className="mt-2 text-xs text-muted-foreground">
+                                        You must be at least 18 years old to join Marahuyo.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label
+                                        htmlFor="bio"
+                                        className="block text-sm font-medium mb-2 text-primary"
+                                    >
+                                        Bio
+                                    </label>
+                                    <textarea
+                                        id="bio"
+                                        required
+                                        value={bio}
+                                        onChange={(event) => setBio(event.target.value)}
+                                        disabled={loading}
+                                        rows={4}
+                                        maxLength={500}
+                                        className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all bg-input border border-border text-foreground backdrop-blur-md"
+                                        placeholder="Share a little about yourself..."
+                                    />
+                                    <p className="mt-2 text-xs text-muted-foreground">
+                                        Up to 500 characters.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label
+                                        htmlFor="profilePicture"
+                                        className="block text-sm font-medium mb-2 text-primary"
+                                    >
+                                        Profile Picture
+                                    </label>
+                                    <input
+                                        id="profilePicture"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleProfilePictureChange}
+                                        disabled={loading}
+                                        className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all bg-input border border-border text-foreground backdrop-blur-md"
+                                    />
+                                    <p className="mt-2 text-xs text-muted-foreground">
+                                        Optional. Images only, up to 5MB.
+                                    </p>
+                                    {profilePicture && (
+                                        <p className="mt-2 text-xs text-secondary">
+                                            Selected file: {profilePicture.name}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                         <div>
                             <label
                                 htmlFor="email"
