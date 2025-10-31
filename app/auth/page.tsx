@@ -179,10 +179,20 @@ export default function AuthPage() {
                     return;
                 }
 
+                const redirectBase =
+                    typeof window !== "undefined"
+                        ? process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin
+                        : process.env.NEXT_PUBLIC_APP_URL;
+
+                const emailRedirectTo = redirectBase
+                    ? `${redirectBase.replace(/\/$/, "")}/auth`
+                    : undefined;
+
                 const { data, error: signUpError } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
+                        emailRedirectTo,
                         data: {
                             full_name: sanitizedFullName,
                             birthdate,

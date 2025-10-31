@@ -75,8 +75,9 @@ import {
     updateUserProfile,
     updateProfileDetails,
 } from "@/lib/actions/profile";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function EditProfilePage() {
     const [loading, setLoading] = useState(true);
@@ -129,6 +130,12 @@ children: string;
     const [locationError, setLocationError] = useState<string | null>(null);
     const [isLocating, setIsLocating] = useState(false);
     const [email, setEmail] = useState<string>("");
+    const [photoUploadSuccess, setPhotoUploadSuccess] = useState<string | null>(null);
+    const maxBirthdate = useMemo(() => {
+        const date = new Date();
+        date.setFullYear(date.getFullYear() - 18);
+        return date.toISOString().split("T")[0];
+    }, []);
     const hasLocation = location.lat !== null && location.lng !== null;
  
     useEffect(() => {
@@ -171,16 +178,73 @@ children: string;
         loadProfile();
     }, []);
 
+    function validateBirthdate(value: string) {
+        if (!value) {
+            setError("Birthdate is required.");
+            return false;
+        }
+
+        const parsedDate = new Date(value);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            setError("Please enter a valid birthdate.");
+            return false;
+        }
+
+        const today = new Date();
+        const eighteenYearsAgo = new Date(
+            today.getFullYear() - 18,
+            today.getMonth(),
+            today.getDate()
+        );
+
+        if (parsedDate > eighteenYearsAgo) {
+            setError("You must be at least 18 years old.");
+            return false;
+        }
+
+        return true;
+    }
+
     async function handleFormSubmit(e: React.FormEvent) {
 e.preventDefault();
 
 setSaving(true);
 setError(null);
+setPhotoUploadSuccess(null);
 
 try {
+    const trimmedName = formData.full_name.trim();
+    const trimmedBio = formData.bio.trim();
+
+    if (!trimmedName) {
+    setError("Full name is required.");
+    setSaving(false);
+    return;
+    }
+
+    if (!trimmedBio) {
+    setError("Bio is required.");
+    setSaving(false);
+    return;
+    }
+
+    if (!validateBirthdate(formData.birthdate)) {
+    setSaving(false);
+    return;
+    }
+
+    setFormData((prev) => ({
+    ...prev,
+    full_name: trimmedName,
+    bio: trimmedBio,
+    }));
+
     const { profile_picture_url: _profilePictureUrl, ...profileDataToUpdate } = formData;
     const payload: Partial<UserProfile> = {
         ...profileDataToUpdate,
+        full_name: trimmedName,
+        bio: trimmedBio,
         location_lat: location.lat,
         location_lng: location.lng,
     };
@@ -284,6 +348,14 @@ setProfileDetails((prev) => {
 });
 }
 
+    function handlePhotoUploaded(url: string) {
+        setFormData((prev) => ({
+            ...prev,
+            profile_picture_url: url,
+        }));
+        setPhotoUploadSuccess("Profile photo updated successfully.");
+    }
+
     async function handleUseCurrentLocation() {
         setLocationError(null);
 
@@ -358,6 +430,106 @@ setProfileDetails((prev) => {
         style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid rgba(255, 255, 255, 0.1)" }}
         onSubmit={handleFormSubmit}
         >
+        <div className="mb-8 flex flex-col items-center gap-6 md:flex-row md:items-start">
+            <div className="relative">
+            <div className="w-32 h-32 rounded-full overflow-hidden border-2" style={{ borderColor: "hsl(45 90% 55%)", boxShadow: "0 0 30px hsl(45 90% 55% / 0.2)" }}>
+                <Image
+                src={formData.profile_picture_url || "/default-avatar.svg"}
+                alt={formData.full_name ? `${formData.full_name}'s profile picture` : "Profile picture"}
+                width={128}
+                height={128}
+                className="w-full h-full object-cover"
+                />
+            </div>
+            <PhotoUpload onPhotoUploaded={handlePhotoUploaded} />
+            </div>
+
+            <div className="flex-1 w-full space-y-4">
+            <div>
+                <label
+                htmlFor="full_name"
+                className="block text-sm font-medium mb-2"
+                style={{ color: "hsl(45 90% 55%)" }}
+                >
+                Full Name *
+                </label>
+                <input
+                id="full_name"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleInputChange}
+                required
+                maxLength={150}
+                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                }}
+                placeholder="Your full name"
+                />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                <label
+                    htmlFor="birthdate"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "hsl(45 90% 55%)" }}
+                >
+                    Birthdate *
+                </label>
+                <input
+                    type="date"
+                    id="birthdate"
+                    name="birthdate"
+                    value={formData.birthdate ?? ""}
+                    onChange={handleInputChange}
+                    required
+                    max={maxBirthdate}
+                    className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                    style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "hsl(220 10% 95%)"
+                    }}
+                />
+                <p className="text-xs mt-1" style={{ color: "hsl(220 10% 60%)" }}>
+                    You must be at least 18 years old.
+                </p>
+                </div>
+
+                <div>
+                <label
+                    htmlFor="email"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "hsl(45 90% 55%)" }}
+                >
+                    Email
+                </label>
+                <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    disabled
+                    className="w-full px-4 py-2 rounded-lg cursor-not-allowed"
+                    style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    border: "1px solid rgba(255, 255, 255, 0.15)",
+                    color: "hsl(220 10% 65%)"
+                    }}
+                />
+                </div>
+            </div>
+
+            {photoUploadSuccess && (
+                <p className="text-xs" style={{ color: "hsl(150 60% 60%)" }}>
+                {photoUploadSuccess}
+                </p>
+            )}
+            </div>
+        </div>
+
         <div className="mb-8">
             <label className="block text-sm font-medium mb-3" style={{ color: "hsl(45 90% 55%)" }}>
             📍 Location for Discovery
