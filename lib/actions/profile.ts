@@ -290,9 +290,9 @@ export async function updateUserProfile(profileData: Partial<UserProfile>) {
     if (profileData.bio) updatePayload.bio = profileData.bio;
     if (profileData.gender) updatePayload.gender = profileData.gender;
     if (profileData.birthdate) updatePayload.birthdate = profileData.birthdate;
-    if (profileData.location_lat)
+    if (profileData.location_lat !== undefined)
         updatePayload.location_lat = profileData.location_lat;
-    if (profileData.location_lng)
+    if (profileData.location_lng !== undefined)
         updatePayload.location_lng = profileData.location_lng;
     if (profileData.preferences)
         updatePayload.preferences = profileData.preferences;

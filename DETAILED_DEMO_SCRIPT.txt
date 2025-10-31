@@ -1,0 +1,188 @@
+# 🎬 MARAHUYO DATING APP - COMPREHENSIVE DEMO SCRIPT
+## With Detailed Technical Explanations for Each Module
+
+---
+
+# MODULE 1: USER REGISTRATION & LOGIN
+
+## 1.1 Landing Page & Theme System
+
+When you first open the Marahuyo dating app at `https://marahuyo.vercel.app/`, you're greeted with a stunning cosmic gradient background that immediately sets the mood. The visual design showcases Next.js 15 and Tailwind CSS v4 at work—the gradient transitions smoothly between dark blues and purples, creating a premium dating app aesthetic. This is the Luna theme, which is the default dark mode designed to reduce eye strain during late-night browsing and provide an immersive experience.
+
+The most innovative feature visible on the home page is the Sol/Luna theme toggle in the top-right navbar. This toggle button displays a moon icon (🌙) for Luna (dark mode) or a sun icon (☀️) for Sol (light mode). When you click this button, something remarkable happens: the entire application's colors shift instantly without a page refresh. This is powered by advanced CSS custom variables and React Context API. Behind the scenes, the `ThemeContext` component manages the theme state, and when you toggle the theme, it updates the `document.documentElement.classList` to either "luna" or "sol". This adds a CSS class to the HTML root element, which triggers predefined CSS custom variables to apply different colors. For example, in Luna mode, `--primary: 45 90% 55%;` (golden) is active, but in Sol mode, it becomes `--primary: 45 90% 50%;` (slightly different golden). All Tailwind classes that reference `text-primary` or `bg-primary` automatically inherit these new values because Tailwind's `@theme` directive in the configuration maps these CSS variables to utility classes. The theme preference is also persisted to `localStorage`, so when you return to the app tomorrow, your theme preference is remembered.
+
+The "Sign In" button is prominently displayed using a gradient background (`bg-gradient-warm`) that uses `linear-gradient(135deg, hsl(45 90% 55%), hsl(25 85% 55%))`. This gradient is defined as a CSS custom variable for consistency across the app. When you hover over the button, it includes a subtle shadow effect (`var(--shadow-glow-warm)`) that creates a glowing appearance, making the call-to-action more visually appealing. This entire visual experience is responsive—on mobile devices, the button adapts its size and padding to ensure it's easily clickable.
+
+## 1.2 Authentication Page & Form Validation
+
+Clicking the Sign In button navigates you to `/auth`, where you encounter the authentication form powered by Supabase Auth. This page displays two tabs: "Sign Up" for new users and "Sign In" for returning users. The form is implemented using React hooks (`useState` for managing form state, `useEffect` for side effects) and connects directly to Supabase's authentication backend.
+
+On the Sign Up tab, the form collects three pieces of information: Email, Full Name, and Password. Each field implements real-time client-side validation. The email field validates using a regular expression pattern to ensure it matches the standard email format (`^[^\s@]+@[^\s@]+\.[^\s@]+$`). The password field enforces strict security requirements: minimum 8 characters, at least one uppercase letter, one number, and one special character. These validations happen immediately as you type, providing instant feedback. If a field fails validation, an error message appears below it in red text, and the field is highlighted with a red border. Importantly, the submit button remains disabled until all validations pass, preventing invalid data from being submitted.
+
+When you fill in the fields and click "Create Account", the form enters a loading state. A spinner animation appears on the button, and all fields become disabled to prevent double-submission. Behind the scenes, the `signUp()` function from `contexts/auth-contexts.tsx` is called, which executes the following process: First, it sends the credentials to `supabase.auth.signUp()`, Supabase's authentication API. Supabase receives the email, password, and user metadata (full_name). It immediately hashes the password using bcrypt (industry-standard password hashing algorithm with 10 salt rounds), ensuring the plain password is never stored. Then, Supabase creates a user record in its auth system and triggers an email verification flow. Simultaneously, the app creates a new record in the PostgreSQL `users` table with the provided information and automatically generates an empty `profiles` table entry for this user to fill in later.
+
+## 1.3 Session Management & Persistence
+
+After successful registration, the app automatically redirects to `/discover`. This redirect is controlled by the `AuthProvider` component which wraps the entire app. The `AuthProvider` uses `useEffect` to listen for authentication state changes from Supabase. When a user successfully registers or logs in, Supabase returns a session object containing an access token and refresh token. The `AuthProvider` stores this session in the browser's `localStorage` and sets an `sb-auth-token` cookie with the `HttpOnly` and `Secure` flags. The `HttpOnly` flag is crucial for security—it prevents JavaScript from accessing the cookie, making it immune to XSS (cross-site scripting) attacks. The `Secure` flag ensures the cookie is only transmitted over HTTPS connections.
+
+On page refresh or when you return to the app later, Supabase automatically checks if a valid session exists by reading the stored token. If valid, the user remains logged in. If the session has expired, Supabase attempts to refresh it using the refresh token. This seamless experience is what makes the app feel responsive and user-centric. The navbar now displays the user's profile picture (fetched from the `users` table) and shows authenticated-only navigation links like "Discover", "Messages", and "Matches".
+
+## 1.4 Login Flow & Password Security
+
+When you click the "Sign In" tab and enter your credentials (`michael.jordan@example.com` / `password`), you're testing the login flow. These credentials come from the dummy profiles created by the `scripts/dummy-profile.ts` script, which seeds the database with 15 NBA player profiles for testing purposes. The login process works as follows: You enter your email and password, then click "Sign In". The `signIn()` function sends these credentials to `supabase.auth.signInWithPassword()`. Supabase retrieves the user record with the matching email, retrieves the stored bcrypt hash of the password, and compares the hash of your entered password against the stored hash. Bcrypt is designed to be computationally expensive—this comparison takes about 100ms deliberately, making brute-force attacks impractical.
+
+If the hashes match, Supabase generates a new session token and returns it to the client. If they don't match, Supabase returns an error, and the form displays "Invalid credentials" without specifying whether the email or password was wrong (a security best practice that prevents account enumeration attacks). Upon successful login, the session is stored similarly to registration, and you're redirected to the authenticated application.
+
+The password security model ensures that even if someone gained unauthorized access to the Supabase database, they couldn't see the plaintext passwords. Each password is hashed with a unique salt, meaning the same password generates different hashes for different users. Even Supabase staff cannot view user passwords. If a user forgets their password, the password reset flow sends them an email with a recovery token that allows them to set a new password, but this entire process happens securely without Supabase ever knowing the new password before it's hashed and stored.
+
+## 1.5 Future Security Enhancements
+
+The current authentication system covers the basics, but the Phase 1 roadmap includes several enhancements. Email verification will prevent users from registering with typo'd emails and ensure they actually control that email address. Two-factor authentication (2FA) will add an extra layer of security—after entering your password, you'll need to provide a time-based one-time password (TOTP) from an authenticator app like Google Authenticator or Authy. Password reset functionality will allow users who forget their passwords to securely reset them via email without requiring Supabase staff intervention. Rate limiting will prevent brute-force attacks by limiting the number of login attempts from a single IP address within a time window.
+
+---
+
+# MODULE 2: USER PROFILE MANAGEMENT
+
+## 2.1 Profile Data Architecture
+
+The profile data in Marahuyo is distributed across two tables in the PostgreSQL database: the `users` table and the `profiles` table. This separation follows database normalization principles. The `users` table contains core user information and authentication-related fields including the user ID (generated by Supabase Auth), email address, full name, gender, birthdate, bio, profile picture URL, and the preferences JSON object. The `preferences` object is a complex data structure stored as JSONB (JSON binary type in PostgreSQL), containing nested objects for age_range (with min and max), distance_miles, an array of gender_preferences, and relationship_goal. This JSONB approach allows efficient querying—PostgreSQL can index into the JSON structure, so queries like "find users who prefer females" can use indexes for performance.
+
+The `profiles` table stores additional details about the user including height in centimeters, education level, occupation, relationship goal (duplicated here for quick access), smoking status (boolean or null), drinking status (boolean or null), and children preference (enum or text). This table has a foreign key relationship to the `users` table through the `user_id` column. The separation allows users to have basic account information without mandatory profile details—they can register with just email/password and gradually fill in their profile.
+
+## 2.2 Fetching & Displaying Profile Data
+
+When you navigate to `/profile`, the page component executes a `useEffect` hook that calls the `getCurrentUserProfile()` server action. This server action connects to the Supabase client configured with service role privileges (allowing it to read any user's data server-side) and executes a SQL query that joins the `users` and `profiles` tables. The query retrieves all columns from both tables for the currently authenticated user. In the browser, you see this data populated across multiple sections. The profile header displays the profile picture (if available) with a golden glow shadow effect created by the CSS variable `var(--shadow-glow-warm)`. Beside the picture, the user's full name is displayed alongside their calculated age. The age calculation happens in real-time using the `calculateAge()` helper function, which subtracts the birthdate from today's date and calculates years. This is done client-side rather than storing a separate age column, ensuring the age is always accurate without requiring updates on every birthday.
+
+The "Basic Information" card displays the gender and birthdate in a two-column grid. These are fetched from the `users` table. The "Additional Details" card displays optional fields like height, occupation, education, and relationship goal from the `profiles` table. If any of these fields are null in the database, the component conditionally renders them—they simply don't appear, keeping the profile clean. The "Discovery Preferences" section displays the matching preferences stored in the `users.preferences` JSONB column, showing the age range (as a range, e.g., "28-38"), distance radius, gender preferences (as a comma-separated list), and relationship goal.
+
+## 2.3 Profile Editing & Form State Management
+
+When you click "Edit Profile" and navigate to `/profile/edit`, a similar `useEffect` loads the profile data into form state. The form uses React's `useState` hook to maintain local state for each field. As you modify each field, the component updates only that field in state—for example, changing the bio field calls `setBio(newValue)`, updating only the bio in state without touching other fields. This local state management provides instant UI feedback without server round-trips.
+
+When you change the age range slider, the component tracks the minimum and maximum values separately in state. The distance slider similarly updates a single distance_miles value. Gender preference checkboxes update an array in state. For the relationship goal dropdown, selecting a new option updates a single relationship_goal string in state. This granular state management allows each form field to have independent validation and feedback.
+
+When you click "Save Changes", the form data is serialized into a payload object and passed to the `updateUserProfile()` server action. This action sends a request to the backend, which executes two SQL UPDATE statements within a transaction. The first updates the `users` table, setting the bio and preferences (converting the form data back into JSONB). The second updates the `profiles` table with height, occupation, education, and lifestyle details. Both statements include a WHERE clause `WHERE id = $1` and `WHERE user_id = $1` respectively to ensure only the current user's data is updated. Critically, these updates are wrapped in a SQL transaction, meaning both queries must succeed for either change to be persisted. If one fails, both are rolled back, preventing partial updates that could corrupt data.
+
+## 2.4 Image Upload & Storage
+
+When you click "Upload Photo" and select an image file, the image is processed and uploaded to Supabase Storage. The upload path is `profile-pictures/{userId}/{filename}`, organizing images by user for logical storage structure and efficient access control. Supabase Storage enforces RLS (Row Level Security) policies ensuring users can only upload to their own directory. The image file is temporarily stored in memory, and a signed URL is generated pointing to the uploaded image. This URL is then saved to the `users.profile_picture_url` column in the database. The image is displayed immediately in the form using this URL, providing instant visual feedback. For storage efficiency, the app enforces a 5MB file size limit and supports only JPG, PNG, and WebP formats. In a future enhancement (Phase 2), image compression will be added using the Sharp library to automatically resize and compress images, reducing storage costs and improving page load times.
+
+## 2.5 Form Validation & Error Handling
+
+The edit profile form implements both client-side and server-side validation. Client-side validation runs before submission, catching obvious errors and providing instant feedback. The email field validates format using regex. The age range validates that minimum is less than maximum. The bio field limits input to 500 characters, updating a character counter as the user types. The height field validates that values are between 100-250 cm. Server-side validation occurs when the form is submitted, re-validating all data to prevent malicious users from bypassing client-side checks via browser console manipulation or direct API calls. If server-side validation fails, an error response returns with specific error messages that are displayed to the user.
+
+---
+
+# MODULE 3: USER DISCOVERY & MATCHING
+
+## 3.1 Preference System & Matching Algorithm
+
+The discovery preferences page (`/discover`) is where users define the criteria for finding matches. The matching algorithm is built on these preferences. When a user sets their age range to 28-38, the system will only show profiles of users between those ages. When setting a distance preference to 75 miles, the system uses the Haversine formula to calculate the geographical distance between the current user's location and potential matches' locations. The Haversine formula accounts for Earth's curvature and provides accurate distances for coordinates on a sphere.
+
+The gender preference filtering allows users to select one or multiple genders they're interested in. The database stores this as an array in JSONB (e.g., `["female", "non-binary"]`). When fetching matches, a SQL WHERE clause checks if the matched user's gender appears in this array. The relationship goal filtering ensures that users looking for casual connections aren't shown to users seeking serious relationships, which could lead to mismatched expectations and poor user experience.
+
+## 3.2 Real-time Preference Persistence
+
+When you adjust preferences and click "Save Preferences", the app sends the updated preferences to the `updateUserPreferences()` server action. This action executes a PostgreSQL UPDATE statement that sets the entire `preferences` JSONB column to the new value. The preferences are immediately reflected in the database, and any subsequent match queries use these updated preferences. The system incorporates a small artificial delay (500ms) to simulate real server processing and provide clear user feedback through the loading spinner. Once saved successfully, a success toast notification appears, confirming the preferences were saved. This visual feedback is crucial for good UX—without it, users might not know if their changes were saved.
+
+## 3.3 Match Discovery & Real-time Matching
+
+When you navigate to `/discover/list` (the Matches page), the app executes a complex SQL query to find compatible matches. This query joins the `users` table with the `profiles` table and applies multiple filters. The simplified logic is: `SELECT * FROM users JOIN profiles ON users.id = profiles.user_id WHERE user.gender IN (current_user.preferences.gender_preferences) AND EXTRACT(YEAR FROM AGE(users.birthdate)) BETWEEN current_user.preferences.age_range.min AND current_user.preferences.age_range.max AND ST_Distance_Sphere(...) <= current_user.preferences.distance_miles * 1609.34 (converting miles to meters) AND users.id NOT IN (SELECT matched_user_id FROM matches WHERE user_id = current_user.id) (excluding already-liked/passed users) ORDER BY ST_Distance(current_user.location, users.location) (ordering by distance)`.
+
+Each match is displayed as a card with the profile picture fetched from Supabase Storage, the name and age calculated from the stored birthdate, the occupation from the `profiles` table, a preview of the bio (first 100 characters), and the calculated distance. Three action buttons are available: Like (green), Pass (red), and Message (blue). The Like and Pass buttons trigger database operations, while the Message button is only active if the two users have already matched.
+
+## 3.4 Like & Pass Mechanics
+
+When you click "Like" on a match, a server action called `likeUser()` is triggered. This action inserts a new record into the `matches` table with the current user's ID as `user_id`, the matched user's ID as `matched_user_id`, and `match_type = 'like'`. Simultaneously, the UI optimistically removes the card from the displayed list (optimistic UI pattern), creating a smooth experience where the card disappears immediately without waiting for server confirmation.
+
+The system then checks if there's a reciprocal like—has the matched user already liked the current user? This is done by querying: `SELECT * FROM matches WHERE user_id = matched_user_id AND matched_user_id = current_user_id AND match_type = 'like'`. If such a record exists, a mutual match is created. Additionally, a Stream Chat channel is automatically created for this pair of users, enabling them to start messaging immediately. The UI displays "Match created! 🎉" confirming mutual attraction.
+
+Clicking "Pass" creates a record with `match_type = 'pass'`. The system ensures these passed users never appear in this user's match list again by excluding them from future queries. This prevents showing the same pass/decline repeatedly, which could be frustrating.
+
+## 3.5 Real-time Match Updates
+
+The real-time nature of matching is powered by Supabase Realtime. When User A likes User B, if User B is currently viewing the matches list, Supabase Realtime broadcasts the new match event through a WebSocket connection. User B's app receives this event and updates its local state to reflect the new match. This happens in real-time (typically <1 second), creating a responsive experience. If two users simultaneously like each other, both receive real-time notifications of the mutual match.
+
+---
+
+# MODULE 4: MESSAGING & CHAT
+
+## 4.1 Chat Architecture with Stream Chat SDK
+
+The Marahuyo messaging system is powered by the Stream Chat SDK, a specialized real-time messaging platform built for applications requiring low-latency communication. Stream Chat handles all the complexity of real-time messaging—managing WebSocket connections, handling disconnections and reconnections, storing message history, managing user presence, and handling features like typing indicators and read receipts. By using Stream Chat rather than building messaging from scratch, Marahuyo gains a battle-tested, scalable infrastructure that can handle millions of concurrent messages.
+
+When you navigate to `/chat`, the page fetches all active conversations for the current user. Each conversation corresponds to a Stream Chat "channel" associated with this user. A Stream Chat channel is a group conversation space, and in Marahuyo's case, each channel represents a one-to-one conversation between two matched users. When a mutual match is created, a channel is automatically created in Stream Chat with a channel ID derived from the two user IDs (e.g., `messaging_{{userId1}}_{{userId2}}`). The chat list displays these channels with metadata like the last message preview, timestamp, unread count, and the other user's profile picture and online status.
+
+## 4.2 Real-time Message Synchronization
+
+When you click on a conversation and navigate to `/chat/[userId]`, the page establishes a WebSocket connection to Stream Chat and "watches" the channel. Watching a channel subscribes your client to all real-time events for that channel—new messages, typing indicators, read receipts, etc. The page fetches message history from Stream Chat's database, displaying all previous messages in chronological order. The UI displays messages with rich metadata: sender name and avatar, message text, timestamp, and delivery/read status.
+
+When you type a message and press Enter, the `sendMessage()` function serializes the message and sends it through the Stream Chat client SDK. The Stream Chat client immediately adds the message to the local message list with an "optimistic update" before the server confirms delivery. This creates a responsive UX—you see your message appear instantly in the UI, even though it's still being transmitted. Simultaneously, the message is sent to Stream Chat's backend via WebSocket. The backend stores the message in its database and broadcasts it to all other clients connected to this channel (in this case, just the other user in the one-to-one conversation).
+
+The other user, even if viewing the same conversation or on a different page, receives the message in real-time through their WebSocket connection. Their client automatically appends the message to the message list and scrolls to the bottom to show the new message. This entire process typically takes <100ms, making the experience feel instantaneous to both participants.
+
+## 4.3 Message Status & Read Receipts
+
+Each message carries status information. When first sent, it shows a single checkmark (✓) indicating "sent to server". Once delivered to the recipient's device, it shows a double checkmark (✓✓) indicating "delivered". When the recipient opens the conversation and scrolls to view the message (or automatically marks the channel as read after a timeout), the message shows a highlighted double checkmark, indicating the message has been "read". This read status is updated in real-time through Stream Chat's infrastructure. The read receipt is controlled by marking the channel as read by calling `channel.markRead()` when the user is actively viewing the conversation.
+
+## 4.4 Message Notifications & MessageNotificationListener
+
+The `MessageNotificationListener` component is mounted at the root level of the application (in `app/layout.tsx`). This component establishes a persistent connection to Stream Chat and listens for the `message.new` event across all channels the user is a member of. When a new message arrives in any channel, the component receives an event containing the message details. The component then triggers a browser notification (if the user has granted permission) displaying the sender's name and message preview. Simultaneously, the component updates the navbar to show an unread badge on the "Messages" link.
+
+The `MessageNotificationListener` uses React refs to track all subscribed channels and the unsubscribe functions. When the component unmounts, it unsubscribes from all channels to prevent memory leaks. The component also handles WebSocket disconnections—if the connection drops, it automatically reconnects using exponential backoff (waiting 1 second, then 2 seconds, then 4 seconds, etc., up to a maximum) to avoid overwhelming the server if connectivity is flaky.
+
+## 4.5 Presence & Online Status
+
+Stream Chat tracks user presence—whether they're currently online or offline. When you load the app, Stream Chat marks you as online. When you close the app or disconnect for more than 30 seconds, it marks you as offline. Each user has a `last_seen` timestamp indicating when they were last active. In the chat list, each conversation shows an online indicator (green dot for online, grey dot for offline) and displays "Last seen: X minutes ago" on hover. This presence information is broadcast in real-time through Stream Chat's infrastructure, allowing both users to see each other's status in real-time.
+
+---
+
+# MODULE 5: MATCH LIST & BLOCKING
+
+## 5.1 Block System & Database Structure
+
+The blocking system is implemented through a `blocks` table in PostgreSQL with the following structure: `id` (UUID primary key), `blocker_id` (foreign key to users—who is doing the blocking), `blocked_id` (foreign key to users—who is being blocked), `reason` (optional text explaining why they blocked the user), and `blocked_at` (timestamp). When a user clicks the block button on another user's profile, a new record is inserted into this table.
+
+The blocking mechanism is enforced through SQL queries and RLS policies. When blocked user tries to view the blocker's profile, a query checks: `SELECT * FROM users WHERE id = current_user_id AND NOT EXISTS (SELECT 1 FROM blocks WHERE blocker_id = current_user_id AND blocked_id = viewer_id)`. If this query returns no results, the profile is not shown. Similarly, blocked users don't appear in the blocker's match list—the match query includes `AND NOT EXISTS (SELECT 1 FROM blocks WHERE blocker_id = current_user_id AND blocked_id = potential_match_id)`. The blocked user cannot send messages to the blocker—Stream Chat channel membership is restricted using the same logic.
+
+## 5.2 Unblocking & User Control
+
+On the `/block` page, users can see their list of blocked users and unblock them anytime. This empowers users with control over their experience. When clicking "Unblock", a confirmation dialog appears asking "Unblock [User Name]? They will be able to find and match with you again." If confirmed, a server action executes `DELETE FROM blocks WHERE blocker_id = current_user_id AND blocked_id = unblocked_user_id`. The block record is removed, and the previously blocked user now appears in the blocker's match list again and can send messages.
+
+## 5.3 Future Analytics & Match Tracking
+
+While not currently implemented, the Phase 2 roadmap includes match history and analytics. The existing `matches` table stores all like/pass interactions, providing the foundation for future features. Analytics queries could retrieve all users the current user has liked: `SELECT matched_user_id FROM matches WHERE user_id = current_user_id AND match_type = 'like'`. To find mutual matches: `SELECT matched_user_id FROM matches m1 WHERE user_id = current_user_id AND match_type = 'like' AND EXISTS (SELECT 1 FROM matches m2 WHERE m2.user_id = m1.matched_user_id AND m2.matched_user_id = current_user_id AND m2.match_type = 'like')`. These queries would power a dedicated match history page showing statistics like "Total likes: 42", "Mutual matches: 12", and a timeline of matches with dates.
+
+---
+
+# TECHNICAL ARCHITECTURE OVERVIEW
+
+## Frontend Rendering Pipeline
+
+The Marahuyo frontend is built with Next.js 15, which provides server-side rendering (SSR) and static site generation (SSG) capabilities. Pages are rendered on the server initially, then rehydrated as interactive React components on the client. When you navigate between pages, Next.js uses client-side navigation, preventing full page refreshes and preserving client state (like scroll position or form values). The authentication state is managed globally through `AuthContext`, ensuring all components can access the current user without prop drilling.
+
+## Backend Services Architecture
+
+The backend comprises multiple services working in concert. Supabase Auth handles user authentication and session management. PostgreSQL (through Supabase) stores all application data with Row-Level Security policies ensuring users can only access their own data. Supabase Storage handles file uploads and serves images through a CDN. Stream Chat manages all messaging, presence, and real-time notifications. Each service is specialized and best-in-class at its domain, allowing Marahuyo to focus on frontend UX rather than rebuilding complex backends.
+
+## Real-time Data Flow
+
+The real-time magic happens through WebSocket connections. When data changes (a new message, a mutual match, an online status update), the backend broadcasts this change to all connected clients through WebSocket. The clients receive these events and update their local state, triggering React re-renders that display the updated information to the user. This push-based architecture (server pushing updates to clients) is far more efficient and responsive than polling (clients repeatedly asking the server "Is there anything new?").
+
+## Security & Data Privacy
+
+All data is transmitted over HTTPS (encrypted in transit). Passwords are hashed with bcrypt and never stored in plaintext. Session tokens are stored in HttpOnly cookies, preventing XSS attacks. Row-Level Security policies in PostgreSQL ensure that even if someone obtained database access, they'd only see their own data. Supabase automatically handles SQL injection protection through parameterized queries. File uploads are restricted by content type and size. API endpoints validate all inputs and check authentication before processing requests.
+
+---
+
+# DEMO FLOW & USER EXPERIENCE
+
+## Complete User Journey
+
+A first-time user lands on the home page, sees the beautiful cosmic gradient design, and clicks "Sign In". They switch to Sign Up, fill in their details (email, name, password), and create an account. They're redirected to the profile edit page where they upload a profile picture, fill in personal details (height, occupation, education, relationship goals), and set their discovery preferences. They then navigate to the discover page, adjust their preferences (age range, distance, gender preferences), and view the matches list. They see potential matches and like one. If that person has already liked them back, they become a mutual match and can immediately start messaging. They navigate to Messages, see their new conversation, and send a message. The other user receives the message in real-time with a notification. If either user doesn't want further contact, they can block the other user, which prevents all future interactions.
+
+Throughout this journey, the user experiences instant feedback, real-time updates, seamless transitions, and a polished UI that responds to their theme preference (Luna or Sol). Every interaction demonstrates modern web development practices: optimistic UI updates, server-side validation, transactional data consistency, and real-time synchronization.
+
+---
+
+**End of Comprehensive Demo Script**

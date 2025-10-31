@@ -123,8 +123,14 @@ children: string;
         children: "",
     });
 
+    const [location, setLocation] = useState<{ lat: number | null; lng: number | null }>(
+        { lat: null, lng: null }
+    );
+    const [locationError, setLocationError] = useState<string | null>(null);
+    const [isLocating, setIsLocating] = useState(false);
     const [email, setEmail] = useState<string>("");
-
+    const hasLocation = location.lat !== null && location.lng !== null;
+ 
     useEffect(() => {
         async function loadProfile() {
     try {
@@ -136,6 +142,10 @@ children: string;
         gender: profileData.gender,
         birthdate: profileData.birthdate ?? "",
         profile_picture_url: profileData.profile_picture_url,
+        });
+        setLocation({
+        lat: profileData.location_lat ?? null,
+        lng: profileData.location_lng ?? null,
         });
         setEmail(profileData.email ?? "");
         
@@ -168,9 +178,14 @@ setSaving(true);
 setError(null);
 
 try {
-    // Update basic profile info (users table)
     const { profile_picture_url: _profilePictureUrl, ...profileDataToUpdate } = formData;
-    const result = await updateUserProfile(profileDataToUpdate);
+    const payload: Partial<UserProfile> = {
+        ...profileDataToUpdate,
+        location_lat: location.lat,
+        location_lng: location.lng,
+    };
+
+    const result = await updateUserProfile(payload);
     if (!result.success) {
     setError(result.error || "Failed to update profile.");
     setSaving(false);
@@ -269,6 +284,49 @@ setProfileDetails((prev) => {
 });
 }
 
+    async function handleUseCurrentLocation() {
+        setLocationError(null);
+
+        if (typeof window === "undefined" || !("geolocation" in navigator)) {
+            setLocationError("Geolocation is not supported in this browser.");
+            return;
+        }
+
+        setIsLocating(true);
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+
+                setLocation({
+                    lat: Number(latitude.toFixed(6)),
+                    lng: Number(longitude.toFixed(6)),
+                });
+                setIsLocating(false);
+            },
+            (geoError) => {
+                switch (geoError.code) {
+                    case geoError.PERMISSION_DENIED:
+                        setLocationError("Location permission was denied.");
+                        break;
+                    case geoError.POSITION_UNAVAILABLE:
+                        setLocationError("Unable to determine your location.");
+                        break;
+                    case geoError.TIMEOUT:
+                        setLocationError("Timed out while retrieving your location.");
+                        break;
+                    default:
+                        setLocationError("Failed to get your current location.");
+                }
+                setIsLocating(false);
+            }
+        );
+    }
+
+    function handleClearLocation() {
+        setLocation({ lat: null, lng: null });
+    }
+ 
     if (loading) {
         return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(220 30% 8%), hsl(270 40% 15%), hsl(200 35% 12%))" }}>
@@ -301,146 +359,53 @@ setProfileDetails((prev) => {
         onSubmit={handleFormSubmit}
         >
         <div className="mb-8">
-            <label className="block text-sm font-medium mb-4" style={{ color: "hsl(45 90% 55%)" }}>
-            📷 Profile Picture
+            <label className="block text-sm font-medium mb-3" style={{ color: "hsl(45 90% 55%)" }}>
+            📍 Location for Discovery
             </label>
-            <div className="flex items-center space-x-6">
-            <div className="relative">
-                <div className="w-24 h-24 rounded-full overflow-hidden" style={{ boxShadow: "0 0 20px hsl(45 90% 55% / 0.3)" }}>
-                <img
-                    src={
-                    formData.profile_picture_url || "/default-avatar.svg"
-                    }
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                />
-                </div>
-                <PhotoUpload
-                onPhotoUploaded={(url) => {
-                    setFormData((prev) => ({
-                    ...prev,
-                    profile_picture_url: url,
-                    }));
+            <p className="text-xs" style={{ color: "hsl(220 10% 65%)" }}>
+            We use your saved coordinates to surface matches within your preferred distance.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 mt-4">
+            <button
+                type="button"
+                onClick={handleUseCurrentLocation}
+                disabled={isLocating}
+                className="px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                backgroundColor: "hsl(45 90% 55%)",
+                color: "hsl(222 47% 11%)",
+                opacity: isLocating ? 0.7 : 1,
                 }}
-                />
-            </div>
-
-            <div>
-                <p className="text-sm mb-2" style={{ color: "hsl(220 10% 70%)" }}>
-                Upload a new profile picture
-                </p>
-                <p className="text-xs" style={{ color: "hsl(220 10% 60%)" }}>
-                JPG, PNG or GIF. Max 5MB.
-                </p>
-            </div>
-            </div>
-        </div>
-
-        {/* Basic info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-            <label
-                htmlFor="full_name"
-                className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
             >
-                Full Name *
-            </label>
-            <input
-                type="text"
-                id="full_name"
-                name="full_name"
-                value={formData.full_name}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                {isLocating ? "Detecting..." : "Use Current Location"}
+            </button>
+            {hasLocation && (
+                <button
+                type="button"
+                onClick={handleClearLocation}
+                className="px-4 py-2 rounded-lg font-medium transition-colors"
+                style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.08)",
                     border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
+                    color: "hsl(220 10% 80%)",
                 }}
-                placeholder="Enter your full name"
-            />
+                >
+                Clear Location
+                </button>
+            )}
             </div>
-
-            <div>
-            <label
-                htmlFor="email"
-                className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
-            >
-                Email
-            </label>
-            <input
-                type="email"
-                id="email"
-                value={email}
-                disabled
-                className="w-full px-4 py-2 rounded-lg cursor-not-allowed opacity-60"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    color: "hsl(220 10% 80%)"
-                }}
-                placeholder="Email address"
-            />
+            <div className="mt-3 text-sm" style={{ color: "hsl(220 10% 70%)" }}>
+            <p>
+                Saved coordinates: {hasLocation ? `${location.lat?.toFixed(5)}, ${location.lng?.toFixed(5)}` : "Not yet set"}
+            </p>
             </div>
+            {locationError && (
+            <p className="mt-2 text-sm" style={{ color: "hsl(0 84% 70%)" }}>
+                {locationError}
+            </p>
+            )}
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-            <label
-                htmlFor="gender"
-                className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
-            >
-                Gender *
-            </label>
-            <select
-                id="gender"
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
-            >
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="non-binary">Non-binary</option>
-                <option value="prefer_not_to_say">Prefer not to say</option>
-            </select>
-            </div>
-
-            <div>
-            <label
-                htmlFor="birthdate"
-                className="block text-sm font-medium mb-2"
-                style={{ color: "hsl(45 90% 55%)" }}
-            >
-                Birthday *
-            </label>
-            <input
-                type="date"
-                id="birthdate"
-                name="birthdate"
-                value={formData.birthdate}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                style={{ 
-                    backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    color: "hsl(220 10% 95%)"
-                }}
-            />
-            </div>
-        </div>
-
+ 
         <div className="mb-8">
             <label
             htmlFor="bio"

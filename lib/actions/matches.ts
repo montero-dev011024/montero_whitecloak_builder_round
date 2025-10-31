@@ -162,6 +162,48 @@ export async function getPotentialMatches(): Promise<UserProfile[]> {
         | UserPreferences
         | null;
     const genderPreferences = currentUserPrefs?.gender_preferences ?? [];
+    const ageRange = currentUserPrefs?.age_range ?? { min: 18, max: 100 };
+    const maxDistanceMiles = currentUserPrefs?.distance_miles ?? 100;
+
+    // Get current user's location for distance calculation
+    const { data: currentUserData, error: currentUserError } = await supabase
+        .from("users")
+        .select("location_lat, location_lng")
+        .eq("id", userId)
+        .single();
+
+    if (currentUserError) {
+        throw new Error("Failed to get current user location");
+    }
+
+    const calculateDistance = (lat1: number | null, lon1: number | null, lat2: number | null, lon2: number | null): number | null => {
+        if (lat1 === null || lon1 === null || lat2 === null || lon2 === null) {
+            return null;
+        }
+
+        const R = 3959; // Earth's radius in miles
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
+
+    const calculateAge = (birthdate: string): number => {
+        const today = new Date();
+        const birth = new Date(birthdate);
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        return age;
+    };
 
     return (potentialMatches ?? [])
         .filter((match) => !blockedUserIds.has(match.id))
@@ -172,6 +214,27 @@ export async function getPotentialMatches(): Promise<UserProfile[]> {
             }
 
             return genderPreferences.includes(match.gender);
+        })
+        .filter((match) => {
+            // Filter by age range
+            const matchAge = calculateAge(match.birthdate);
+            return matchAge >= ageRange.min && matchAge <= ageRange.max;
+        })
+        .filter((match) => {
+            // Filter by distance
+            const distance = calculateDistance(
+                currentUserData?.location_lat ?? null,
+                currentUserData?.location_lng ?? null,
+                match.location_lat,
+                match.location_lng
+            );
+
+            // If distance cannot be calculated (missing location data), include the match
+            if (distance === null) {
+                return true;
+            }
+
+            return distance <= maxDistanceMiles;
         })
         .map((match) => mapUserRowToProfile(match));
 }

@@ -454,7 +454,7 @@
                                                     id="distance_miles"
                                                     name="distance_miles"
                                                     min="1"
-                                                    max="500"
+                                                    max="999999999"
                                                     value={preferences.distance_miles}
                                                     onChange={handlePreferencesChange}
                                                     className="w-full px-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all bg-input border border-border text-foreground"
@@ -464,7 +464,7 @@
                                                     <span className="font-medium text-primary">
                                                         Within {preferences.distance_miles} miles
                                                     </span>
-                                                    <span>500 miles</span>
+                                                    <span>999,999,999 miles</span>
                                                 </div>
                                             </div>
                                         </div>
